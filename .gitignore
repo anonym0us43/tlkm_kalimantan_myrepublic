@@ -31,13 +31,13 @@ _ide_helper.php
 CLAUDE.md
 /graphify-out/
 
-# storage/
+storage/
 !storage/app/public/
 /public/storage
 /public/build
 /public/hot
 /public/fonts-manifest.dev.json
-# /bootstrap/cache/
+/bootstrap/cache/
 
 Homestead.json
 Homestead.yaml
