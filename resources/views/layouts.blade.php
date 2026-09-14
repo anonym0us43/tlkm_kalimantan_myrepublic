@@ -362,12 +362,6 @@
 				font-weight: 600;
 			}
 
-			.page-wrapper.compact-wrapper .page-header .header-wrapper .toggle-sidebar {
-				display: flex;
-				align-items: center;
-				cursor: pointer;
-			}
-
 			.page-wrapper.compact-wrapper .page-body-wrapper div.sidebar-wrapper {
 				transition: transform 0.3s ease !important;
 			}
@@ -378,7 +372,7 @@
 
 			.page-wrapper.compact-wrapper .page-body-wrapper div.sidebar-wrapper.close_icon {
 				width: 265px !important;
-				transform: translateX(-265px);
+				transform: translateX(-265px) !important;
 				overflow: hidden !important;
 			}
 
@@ -395,6 +389,46 @@
 			.page-wrapper.compact-wrapper .page-body-wrapper div.sidebar-wrapper.close_icon ~ .page-body,
 			.page-wrapper.compact-wrapper .page-body-wrapper div.sidebar-wrapper.close_icon ~ footer {
 				margin-left: 0 !important;
+			}
+
+			#sidebarHamburger {
+				background: none;
+				border: none;
+				padding: 4px 8px;
+				cursor: pointer;
+				color: #495057;
+				border-radius: 6px;
+			}
+
+			#sidebarHamburger:hover {
+				background: #f0f1fd;
+			}
+
+			#sidebarHamburger svg {
+				width: 20px;
+				height: 20px;
+				stroke: #495057;
+			}
+
+			#sidebarHamburger:hover svg {
+				stroke: var(--brand-primary);
+			}
+
+			.sidebar-closed #sidebarHamburger {
+				display: flex !important;
+			}
+
+			.page-wrapper.compact-wrapper .page-body-wrapper div.sidebar-wrapper .logo-wrapper {
+				position: relative;
+			}
+
+			.page-wrapper.compact-wrapper .page-body-wrapper div.sidebar-wrapper .logo-wrapper img {
+				max-width: 190px;
+			}
+
+			.page-wrapper.compact-wrapper .page-body-wrapper div.sidebar-wrapper .logo-wrapper .toggle-sidebar {
+				top: 50%;
+				transform: translateY(-50%);
 			}
 		</style>
 	</head>
@@ -415,6 +449,19 @@
 		<div class="page-wrapper compact-wrapper" id="pageWrapper">
 			<div class="page-header">
 				<div class="header-wrapper row m-0">
+					<button
+						id="sidebarHamburger"
+						class="col-auto d-none align-items-center justify-content-center"
+						type="button"
+						aria-label="Toggle Sidebar"
+					>
+						<i data-feather="menu"></i>
+					</button>
+					<div
+						class="col-auto d-flex align-items-center"
+						id="headerClock"
+						style="font-size: 13px; font-weight: 600; color: #495057; white-space: nowrap"
+					></div>
 					<form class="form-inline search-full col" action="#" method="get">
 						<div class="form-group w-100">
 							<div class="Typeahead Typeahead--twitterUsers">
@@ -717,6 +764,67 @@
 					$title.find('.according-menu i').removeClass('fa-angle-right').addClass('fa-angle-down');
 					$submenu.show();
 				}
+
+				(function () {
+					var HARI = ['Minggu', 'Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu'];
+					var BULAN = [
+						'Januari',
+						'Februari',
+						'Maret',
+						'April',
+						'Mei',
+						'Juni',
+						'Juli',
+						'Agustus',
+						'September',
+						'Oktober',
+						'November',
+						'Desember',
+					];
+					var el = document.getElementById('headerClock');
+
+					function pad(n) {
+						return n < 10 ? '0' + n : n;
+					}
+
+					function tick() {
+						var now = new Date();
+						var d = HARI[now.getDay()] + ', ' + now.getDate() + ' ' + BULAN[now.getMonth()] + ' ' + now.getFullYear();
+						var t = pad(now.getHours()) + ':' + pad(now.getMinutes()) + ':' + pad(now.getSeconds());
+						el.textContent = d + ' | ' + t;
+					}
+
+					tick();
+					setInterval(tick, 1000);
+				})();
+
+				var $nav = $('.sidebar-wrapper');
+				var $header = $('.page-header');
+				var $wrapper = $('#pageWrapper');
+				var SIDEBAR_KEY = 'mora-sidebar-closed';
+
+				function applySidebar(closed) {
+					if (closed) {
+						$nav.addClass('close_icon');
+						$header.addClass('close_icon');
+						$wrapper.addClass('sidebar-closed');
+					} else {
+						$nav.removeClass('close_icon');
+						$header.removeClass('close_icon');
+						$wrapper.removeClass('sidebar-closed');
+					}
+				}
+
+				applySidebar(localStorage.getItem(SIDEBAR_KEY) === 'true');
+
+				$('.toggle-sidebar').off('click');
+
+				$('.toggle-sidebar, #sidebarHamburger').on('click', function () {
+					var willClose = !$nav.hasClass('close_icon');
+					localStorage.setItem(SIDEBAR_KEY, willClose ? 'true' : 'false');
+					applySidebar(willClose);
+					feather.replace();
+				});
 			});
 		</script>
 		@yield("scripts")
