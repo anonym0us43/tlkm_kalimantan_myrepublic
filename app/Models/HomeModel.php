@@ -7,7 +7,7 @@ use Illuminate\Support\Facades\DB;
 
 class HomeModel extends Model
 {
-    public static function dailyReport(string $startDate, string $endDate, ?string $area, ?string $woType): array
+    public static function dailyReport(string $startDate, string $endDate, ?string $area, ?array $woTypes): array
     {
         $query = DB::table('tb_stella_workorders as tsw')
             ->leftJoin('tb_webcc_wo_korlap as twk', 'tsw.workOrderNumber_id', '=', 'twk.wo_number_id')
@@ -39,9 +39,9 @@ class HomeModel extends Model
             $query->where('tsw.area', $area);
         }
 
-        if ($woType)
+        if (!empty($woTypes))
         {
-            $query->where('tsw.workOrderType', $woType);
+            $query->whereIn('tsw.workOrderType', $woTypes);
         }
 
         return $query->groupBy('tsw.area')
@@ -90,7 +90,7 @@ class HomeModel extends Model
         string $startDate,
         string $endDate,
         ?string $area,
-        ?string $woType,
+        ?array $woTypes,
         string $column
     ): array
     {
@@ -135,9 +135,9 @@ class HomeModel extends Model
             $query->where('tsw.area', $area);
         }
 
-        if ($woType)
+        if (!empty($woTypes))
         {
-            $query->where('tsw.workOrderType', $woType);
+            $query->whereIn('tsw.workOrderType', $woTypes);
         }
 
         if (str_starts_with($column, 'unassign_'))

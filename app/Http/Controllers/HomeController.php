@@ -25,10 +25,11 @@ class HomeController extends Controller
     public function dailyReport(Request $request): JsonResponse
     {
         $validated = $request->validate([
-            'start_date' => ['required', 'date'],
-            'end_date'   => ['required', 'date', 'after_or_equal:start_date'],
-            'area'       => ['nullable', 'string', 'max:100'],
-            'wo_type'    => ['nullable', 'string', 'max:100'],
+            'start_date'   => ['required', 'date'],
+            'end_date'     => ['required', 'date', 'after_or_equal:start_date'],
+            'area'         => ['nullable', 'string', 'max:100'],
+            'wo_type'      => ['nullable', 'array'],
+            'wo_type.*'    => ['string', 'max:100'],
         ]);
 
         $data = HomeModel::dailyReport(
@@ -67,11 +68,12 @@ class HomeController extends Controller
         ];
 
         $validated = $request->validate([
-            'start_date' => ['required', 'date'],
-            'end_date'   => ['required', 'date', 'after_or_equal:start_date'],
-            'area'       => ['nullable', 'string', 'max:100'],
-            'wo_type'    => ['nullable', 'string', 'max:100'],
-            'column'     => ['required', 'string', Rule::in($allowedColumns)],
+            'start_date'   => ['required', 'date'],
+            'end_date'     => ['required', 'date', 'after_or_equal:start_date'],
+            'area'         => ['nullable', 'string', 'max:100'],
+            'wo_type'      => ['nullable', 'array'],
+            'wo_type.*'    => ['string', 'max:100'],
+            'column'       => ['required', 'string', Rule::in($allowedColumns)],
         ]);
 
         $data = HomeModel::dailyReportDetail(

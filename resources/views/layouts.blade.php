@@ -273,7 +273,7 @@
 								</div>
 								<ul class="profile-dropdown onhover-show-div">
 									<li>
-										<a href="#">
+										<a href="javascript:void(0);">
 											<i data-feather="user"></i>
 											<span>Profile</span>
 										</a>
@@ -361,7 +361,10 @@
 									</li>
 
 									<li class="sidebar-list">
-										<a class="sidebar-link sidebar-title {{ request()->routeIs("dashboard.*") ? "active" : "" }}" href="#">
+										<a
+											class="sidebar-link sidebar-title {{ request()->routeIs("dashboard.*") ? "active" : "" }}"
+											href="javascript:void(0);"
+										>
 											<svg class="stroke-icon">
 												<use href="{{ asset("assets/svg/icon-sprite.svg#stroke-home") }}"></use>
 											</svg>
@@ -391,7 +394,7 @@
 									<li class="sidebar-list">
 										<a
 											class="sidebar-link sidebar-title {{ request()->routeIs("admin.area.*") || request()->routeIs("admin.role.*") || request()->routeIs("admin.employee.*") ? "active" : "" }}"
-											href="#"
+											href="javascript:void(0);"
 										>
 											<svg class="stroke-icon">
 												<use href="{{ asset("assets/svg/icon-sprite.svg#stroke-user") }}"></use>

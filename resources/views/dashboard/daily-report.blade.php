@@ -1,6 +1,6 @@
 @extends("layouts")
 
-@section("title", "Dashboard")
+@section("title", "Daily Report")
 
 @section("breadcrumb")
 	<li class="breadcrumb-item active">Daily Report</li>
@@ -49,57 +49,51 @@
 
 		.th-area {
 			min-width: 150px;
-			background: #f8f9fa;
+			background: #f4f5f7 !important;
+			color: #3d3a4e !important;
 		}
 
 		.th-unassign-group {
-			background: #fff2f2;
-			color: var(--brand-red);
-			border-left: 2px solid var(--brand-red) !important;
-			border-right: 2px solid var(--brand-red) !important;
+			background: #fde8ec !important;
+			color: #b00c26 !important;
 		}
 
 		.th-unassign {
-			background: #fff8f8;
-			border-left: 2px solid var(--brand-red) !important;
+			background: #fff4f6 !important;
+			color: #c8102e !important;
 		}
 
 		.th-unassign-last {
-			border-right: 2px solid var(--brand-red) !important;
 		}
 
 		.th-unassign-total {
-			background: #ffe0e0;
-			color: var(--brand-red);
+			background: #fcd5db !important;
+			color: #b00c26 !important;
 			font-weight: 700;
-			border-right: 2px solid var(--brand-red) !important;
 		}
 
 		.th-onprogress-group {
-			background: #f0eaff;
-			color: var(--brand-purple);
-			border-left: 2px solid var(--brand-purple) !important;
-			border-right: 2px solid var(--brand-purple) !important;
+			background: #ede3fb !important;
+			color: #4a0b8a !important;
 		}
 
 		.th-onprogress {
-			background: #f8f5ff;
-			border-left: 2px solid var(--brand-purple) !important;
+			background: #f6f0ff !important;
+			color: #5b0ea6 !important;
 		}
 
 		.th-onprogress-last {
-			border-right: 2px solid var(--brand-purple) !important;
 		}
 
 		.th-onprogress-total {
-			background: #e8deff;
-			color: var(--brand-purple);
+			background: #dfd0f9 !important;
+			color: #4a0b8a !important;
 			font-weight: 700;
-			border-right: 2px solid var(--brand-purple) !important;
 		}
 
 		.th-tail {
-			background: #f1f3f4;
+			background: #eef0f3 !important;
+			color: #3d3a4e !important;
 			font-size: 10px;
 			font-weight: 700;
 			letter-spacing: 0.03em;
@@ -115,25 +109,70 @@
 		}
 
 		.td-unassign {
-			border-left: 2px solid var(--brand-red) !important;
+			background: #fff4f6;
 		}
 
 		.td-unassign-total {
 			font-weight: 700;
 			color: var(--brand-red);
-			background: #fff8f8;
-			border-right: 2px solid var(--brand-red) !important;
+			background: #fcd5db;
 		}
 
 		.td-onprogress {
-			border-left: 2px solid var(--brand-purple) !important;
+			background: #f6f0ff;
 		}
 
 		.td-onprogress-total {
 			font-weight: 700;
 			color: var(--brand-purple);
-			background: #f8f5ff;
-			border-right: 2px solid var(--brand-purple) !important;
+			background: #dfd0f9;
+		}
+
+		.s2-checkbox-item {
+			display: flex;
+			align-items: center;
+			gap: 8px;
+			padding: 1px 0;
+		}
+
+		.s2-checkbox-item .s2-box {
+			width: 15px;
+			height: 15px;
+			border: 1.5px solid #ced4da;
+			border-radius: 3px;
+			display: flex;
+			align-items: center;
+			justify-content: center;
+			flex-shrink: 0;
+			transition:
+				background 0.15s,
+				border-color 0.15s;
+		}
+
+		.select2-results__option--selected .s2-box,
+		.select2-results__option[aria-selected='true'] .s2-box {
+			background: var(--brand-purple);
+			border-color: var(--brand-purple);
+		}
+
+		.select2-results__option--selected .s2-box::after,
+		.select2-results__option[aria-selected='true'] .s2-box::after {
+			content: '✓';
+			display: block;
+			color: #fff;
+			font-size: 11px;
+			font-weight: 700;
+			line-height: 1;
+		}
+
+		.select2-results__option--selected {
+			background-color: rgba(91, 14, 166, 0.06) !important;
+			color: inherit !important;
+		}
+
+		.select2-container--default .select2-results__option--highlighted[aria-selected] {
+			background-color: rgba(91, 14, 166, 0.1) !important;
+			color: #1e1b2e !important;
 		}
 
 		.td-num {
@@ -159,7 +198,16 @@
 			font-weight: 600;
 			color: #495057;
 			margin-bottom: 5px;
-			display: block;
+			display: flex;
+			align-items: center;
+			gap: 5px;
+		}
+
+		.filter-label-icon {
+			width: 13px;
+			height: 13px;
+			stroke: #5b0ea6;
+			flex-shrink: 0;
 		}
 
 		.filter-control {
@@ -203,6 +251,76 @@
 		.select2-container--default .select2-selection--single .select2-selection__clear {
 			height: 40px;
 			line-height: 40px;
+		}
+
+		.select2-container .select2-selection--multiple {
+			position: relative !important;
+			height: 40px !important;
+			border: 1px solid #dee2e6 !important;
+			border-radius: 6px !important;
+			background: #fff;
+			padding: 0 28px 0 8px !important;
+			cursor: pointer;
+			overflow: hidden;
+		}
+
+		.select2-container--default .select2-selection--multiple .select2-selection__rendered {
+			display: flex !important;
+			align-items: center;
+			flex-wrap: nowrap;
+			padding: 0 !important;
+			height: 38px;
+			overflow: hidden;
+		}
+
+		.select2-container--default .select2-selection--multiple .select2-selection__placeholder {
+			color: #adb5bd !important;
+			font-size: 13.5px !important;
+			line-height: 38px !important;
+			margin: 0 !important;
+		}
+
+		.select2-container--default .select2-selection--multiple .select2-selection__choice {
+			display: none !important;
+		}
+
+		.wo-type-summary {
+			font-size: 13.5px !important;
+			color: #495057 !important;
+			line-height: 38px !important;
+			white-space: nowrap !important;
+			overflow: hidden !important;
+			text-overflow: ellipsis !important;
+			max-width: 100% !important;
+			list-style: none !important;
+			padding: 0 !important;
+			margin: 0 !important;
+			flex-shrink: 1 !important;
+		}
+
+		.select2-container--default .select2-selection--multiple .select2-search--inline {
+			display: none !important;
+		}
+
+		.select2-container--default .select2-selection--multiple .select2-selection__clear {
+			position: absolute !important;
+			right: 8px !important;
+			top: 50% !important;
+			transform: translateY(-50%) !important;
+			color: #adb5bd !important;
+			font-size: 18px !important;
+			line-height: 1 !important;
+			margin: 0 !important;
+			z-index: 1;
+		}
+
+		.select2-container--default .select2-selection--multiple .select2-selection__clear:hover {
+			color: #6c757d !important;
+		}
+
+		#s2-filterWoType-container,
+		.select2-container--default .select2-selection--multiple .select2-selection__rendered .select2-search--inline input {
+			display: none !important;
 		}
 
 		.filter-date-wrap {
@@ -289,7 +407,10 @@
 				<div class="card-body py-2 px-3">
 					<div class="row row-cols-xl-4 row-cols-md-2 row-cols-1 g-2">
 						<div class="col">
-							<label class="filter-label" for="filterArea">Area</label>
+							<label class="filter-label" for="filterArea">
+								<i data-feather="map-pin" class="filter-label-icon"></i>
+								Area
+							</label>
 							<select id="filterArea" class="form-select filter-select2" style="width: 100%">
 								<option value="">Semua Area</option>
 								@foreach ($areas as $area)
@@ -298,16 +419,21 @@
 							</select>
 						</div>
 						<div class="col">
-							<label class="filter-label" for="filterWoType">Tipe Work Order</label>
-							<select id="filterWoType" class="form-select filter-select2" style="width: 100%">
-								<option value="">Semua Tipe</option>
+							<label class="filter-label" for="filterWoType">
+								<i data-feather="layers" class="filter-label-icon"></i>
+								Tipe Work Order
+							</label>
+							<select id="filterWoType" class="form-select" style="width: 100%" multiple>
 								@foreach ($woTypes as $type)
 									<option value="{{ e($type) }}">{{ e($type) }}</option>
 								@endforeach
 							</select>
 						</div>
 						<div class="col">
-							<label class="filter-label" for="filterStartDate">Tanggal Awal</label>
+							<label class="filter-label" for="filterStartDate">
+								<i data-feather="calendar" class="filter-label-icon"></i>
+								Tanggal Awal
+							</label>
 							<div class="filter-date-wrap">
 								<input type="text" id="filterStartDate" class="form-control" placeholder="Pilih tanggal awal" readonly />
 								<span class="filter-date-icon">
@@ -316,7 +442,10 @@
 							</div>
 						</div>
 						<div class="col">
-							<label class="filter-label" for="filterEndDate">Tanggal Akhir</label>
+							<label class="filter-label" for="filterEndDate">
+								<i data-feather="calendar" class="filter-label-icon"></i>
+								Tanggal Akhir
+							</label>
 							<div class="filter-date-wrap">
 								<input type="text" id="filterEndDate" class="form-control" placeholder="Pilih tanggal akhir" readonly />
 								<span class="filter-date-icon">
@@ -547,7 +676,7 @@
 			const startDate = document.getElementById('filterStartDate').value;
 			const endDate = document.getElementById('filterEndDate').value;
 			const area = $('#filterArea').val();
-			const woType = $('#filterWoType').val();
+			const woTypes = $('#filterWoType').val() || [];
 
 			if (!startDate || !endDate) {
 				return;
@@ -558,7 +687,9 @@
 
 			const params = new URLSearchParams({ start_date: startDate, end_date: endDate });
 			if (area) params.set('area', area);
-			if (woType) params.set('wo_type', woType);
+			woTypes.forEach(function (t) {
+				params.append('wo_type[]', t);
+			});
 
 			$.ajax({
 				url: DAILY_REPORT_URL + '?' + params.toString(),
@@ -580,20 +711,43 @@
 			});
 		}
 
-		$('.filter-select2').select2({
+		$('#filterArea').select2({
 			width: '100%',
 			allowClear: true,
-			placeholder: function () {
-				return $(this).data('placeholder') || 'Pilih...';
+			placeholder: 'Semua Area',
+		});
+
+		$('#filterWoType').select2({
+			width: '100%',
+			allowClear: true,
+			placeholder: 'Semua Tipe',
+			closeOnSelect: false,
+			templateResult: function (data) {
+				if (!data.id) return $('<span>' + data.text + '</span>');
+				return $('<span class="s2-checkbox-item"><span class="s2-box"></span><span>' + data.text + '</span></span>');
 			},
 		});
 
-		$('#filterArea').data('placeholder', 'Semua Area');
-		$('#filterWoType').data('placeholder', 'Semua Tipe');
+		function refreshWoTypeDisplay() {
+			const texts = $('#filterWoType option:selected')
+				.map(function () {
+					return $(this).text();
+				})
+				.get();
+			const $rendered = $('#filterWoType').next('.select2-container').find('.select2-selection__rendered');
+			$rendered.find('.wo-type-summary').remove();
+			if (texts.length) {
+				$rendered.prepend('<li class="wo-type-summary">' + texts.join(', ') + '</li>');
+			}
+		}
+
+		$('#filterWoType').on('select2:select select2:unselect select2:clear', function () {
+			refreshWoTypeDisplay();
+		});
 
 		feather.replace();
 
-		$('.filter-select2').on('change', function () {
+		$('#filterArea, #filterWoType').on('change', function () {
 			loadReport();
 		});
 
@@ -651,7 +805,7 @@
 			const area = $(this).data('area');
 			const startDate = document.getElementById('filterStartDate').value;
 			const endDate = document.getElementById('filterEndDate').value;
-			const woType = $('#filterWoType').val();
+			const woTypes = $('#filterWoType').val() || [];
 
 			$('#modalDetailTitle').text((COL_LABELS[col] || col) + ' — ' + (area || 'NASIONAL'));
 
@@ -662,7 +816,9 @@
 
 			const params = new URLSearchParams({ start_date: startDate, end_date: endDate, column: col });
 			if (area) params.set('area', area);
-			if (woType) params.set('wo_type', woType);
+			woTypes.forEach(function (t) {
+				params.append('wo_type[]', t);
+			});
 
 			$.ajax({
 				url: DETAIL_URL + '?' + params.toString(),
