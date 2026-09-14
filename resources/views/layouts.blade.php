@@ -124,6 +124,71 @@
 				color: #9490b0;
 				font-size: 13px;
 			}
+
+			.select2-container--default .select2-selection--single {
+				position: relative;
+				height: calc(1.5em + 0.75rem + 2px);
+				border: 1px solid #ced4da;
+				border-radius: 0.375rem;
+				padding: 0;
+				display: flex;
+				align-items: center;
+			}
+			.select2-container--default .select2-selection--single .select2-selection__rendered {
+				line-height: calc(1.5em + 0.75rem + 8px) !important;
+				padding: 0 3.75rem 0 0.75rem !important;
+				color: #495057;
+				flex: 1;
+				overflow: hidden;
+				text-overflow: ellipsis;
+				white-space: nowrap;
+			}
+			.select2-container--default .select2-selection--single .select2-selection__placeholder {
+				color: #6c757d;
+			}
+			.select2-container--default .select2-selection--single .select2-selection__arrow {
+				position: absolute !important;
+				right: 0 !important;
+				top: 0 !important;
+				height: 100% !important;
+				width: 2rem !important;
+			}
+			.select2-container--default .select2-selection--single .select2-selection__arrow b {
+				border-color: #6c757d transparent transparent transparent;
+				border-style: solid;
+				border-width: 5px 4px 0 4px;
+				position: absolute;
+				top: 50%;
+				left: 50%;
+				margin-top: -2px;
+				margin-left: -4px;
+			}
+			.select2-container--default.select2-container--open .select2-selection--single .select2-selection__arrow b {
+				border-color: transparent transparent #6c757d transparent;
+				border-width: 0 4px 5px 4px;
+				margin-top: -3px;
+			}
+			.select2-container--default .select2-selection--single .select2-selection__clear {
+				position: absolute !important;
+				right: 2.25rem !important;
+				top: 50% !important;
+				transform: translateY(-50%) !important;
+				float: none !important;
+				margin: 0 !important;
+				font-size: 1rem;
+				line-height: 1;
+				color: #6c757d;
+				font-weight: 400;
+			}
+			.select2-container--default .select2-selection--single .select2-selection__clear:hover {
+				color: #dc3545;
+			}
+			.select2-container--default.select2-container--focus .select2-selection--single,
+			.select2-container--default.select2-container--open .select2-selection--single {
+				border-color: #86b7fe;
+				box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25);
+				outline: 0;
+			}
 		</style>
 
 		@yield("styles")
@@ -290,11 +355,16 @@
 									</li>
 
 									<li class="sidebar-main-title">
-										<div><h6 class="lan-1">General</h6></div>
+										<div>
+											<h6>Menu</h6>
+										</div>
 									</li>
 
 									<li class="sidebar-list">
-										<a class="sidebar-link sidebar-title {{ request()->routeIs("home") ? "active" : "" }}" href="#">
+										<a
+											class="sidebar-link sidebar-title {{ request()->routeIs("home") ? "active" : "" }}"
+											href="{{ route("home") }}"
+										>
 											<svg class="stroke-icon">
 												<use href="{{ asset("assets/svg/icon-sprite.svg#stroke-home") }}"></use>
 											</svg>
@@ -303,10 +373,52 @@
 											</svg>
 											<span>Dashboard</span>
 										</a>
+									</li>
+
+									<li class="sidebar-main-title">
+										<div>
+											<h6>Administrator</h6>
+										</div>
+									</li>
+
+									<li class="sidebar-list">
+										<a
+											class="sidebar-link sidebar-title {{ request()->routeIs("admin.area.*") || request()->routeIs("admin.role.*") || request()->routeIs("admin.employee.*") ? "active" : "" }}"
+											href="#"
+										>
+											<svg class="stroke-icon">
+												<use href="{{ asset("assets/svg/icon-sprite.svg#stroke-user") }}"></use>
+											</svg>
+											<svg class="fill-icon">
+												<use href="{{ asset("assets/svg/icon-sprite.svg#fill-user") }}"></use>
+											</svg>
+											<span>Administrator</span>
+										</a>
 										<ul class="sidebar-submenu">
-											<li><a href="#">Menu 1</a></li>
-											<li><a href="#">Menu 2</a></li>
-											<li><a href="#">Menu 3</a></li>
+											<li>
+												<a
+													href="{{ route("admin.area.index") }}"
+													class="{{ request()->routeIs("admin.area.*") ? "active" : "" }}"
+												>
+													Area
+												</a>
+											</li>
+											<li>
+												<a
+													href="{{ route("admin.role.index") }}"
+													class="{{ request()->routeIs("admin.role.*") ? "active" : "" }}"
+												>
+													Role
+												</a>
+											</li>
+											<li>
+												<a
+													href="{{ route("admin.employee.index") }}"
+													class="{{ request()->routeIs("admin.employee.*") ? "active" : "" }}"
+												>
+													Employee
+												</a>
+											</li>
 										</ul>
 									</li>
 								</ul>
@@ -373,38 +485,23 @@
 		<script src="{{ asset("assets/js/script1.js") }}"></script>
 		<script>
 			$(function () {
-				$('.sidebar-links .sidebar-submenu').hide();
+				var currentPath = window.location.pathname;
 
-				$('.sidebar-links .sidebar-title')
-					.off('click')
-					.on('click', function (e) {
-						e.preventDefault();
+				$('.sidebar-submenu a').each(function () {
+					var linkPath = new URL($(this).attr('href'), window.location.origin).pathname;
+					if (currentPath === linkPath) {
+						$(this).addClass('active');
+					}
+				});
 
-						var $submenu = $(this).next('.sidebar-submenu');
-
-						if (!$submenu.length) return;
-
-						var isHidden = $submenu.is(':hidden');
-
-						$('.sidebar-links .sidebar-title')
-							.not(this)
-							.removeClass('active')
-							.find('.according-menu i')
-							.removeClass('fa-angle-down')
-							.addClass('fa-angle-right');
-
-						$('.sidebar-links .sidebar-submenu').not($submenu).slideUp('fast');
-
-						if (isHidden) {
-							$(this).addClass('active').find('.according-menu i').removeClass('fa-angle-right').addClass('fa-angle-down');
-
-							$submenu.slideDown('fast');
-						} else {
-							$(this).removeClass('active').find('.according-menu i').removeClass('fa-angle-down').addClass('fa-angle-right');
-
-							$submenu.slideUp('fast');
-						}
-					});
+				var $activeLink = $('.sidebar-submenu a.active');
+				if ($activeLink.length) {
+					var $submenu = $activeLink.closest('.sidebar-submenu');
+					var $title = $submenu.prev('.sidebar-title');
+					$title.addClass('active');
+					$title.find('.according-menu i').removeClass('fa-angle-right').addClass('fa-angle-down');
+					$submenu.show();
+				}
 			});
 		</script>
 		@yield("scripts")
