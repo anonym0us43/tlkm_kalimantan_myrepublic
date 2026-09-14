@@ -5,9 +5,11 @@
 		<meta http-equiv="X-UA-Compatible" content="IE=edge" />
 		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
 		<meta name="csrf-token" content="{{ csrf_token() }}" />
-		<link rel="icon" href="{{ asset("assets/images/favicon.png") }}" type="image/x-icon" />
-		<link rel="shortcut icon" href="{{ asset("assets/images/favicon.png") }}" type="image/x-icon" />
-		<title>@yield("title", "Dashboard") — MyRepublic</title>
+		<link rel="icon" type="image/png" sizes="192x192" href="{{ asset("assets/images/favicon-192x192.png") }}" />
+		<link rel="icon" type="image/png" href="{{ asset("assets/images/favicon.png") }}" />
+		<link rel="shortcut icon" href="{{ asset("assets/images/favicon.png") }}" />
+		<link rel="apple-touch-icon" sizes="180x180" href="{{ asset("assets/images/apple-touch-icon.png") }}" />
+		<title>@yield("title", "Dashboard") — MoraRepublic</title>
 
 		<link
 			href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;600;700&family=DM+Sans:wght@400;500;600&display=swap"
@@ -27,10 +29,16 @@
 
 		<style>
 			:root {
-				--theme-default: #5b0ea6;
-				--theme-secondary: #c8102e;
-				--brand-purple: #5b0ea6;
-				--brand-red: #c8102e;
+				--theme-default: #1026a8;
+				--theme-secondary: #8e0499;
+				--brand-primary: #1026a8;
+				--brand-royal: #2b36b4;
+				--brand-periwinkle: #6373d5;
+				--brand-deep-purple: #521595;
+				--brand-purple: #630f94;
+				--brand-magenta: #8e0499;
+				--brand-pink: #c34bc3;
+				--brand-orange: #faaa3c;
 			}
 
 			.page-wrapper.compact-wrapper .page-header {
@@ -235,8 +243,8 @@
 					<div class="header-logo-wrapper col-auto p-0">
 						<div class="logo-wrapper">
 							<a href="{{ route("home") }}">
-								<img class="img-fluid for-light" src="{{ asset("assets/images/logo/logo.png") }}" alt="MyRepublic" />
-								<img class="img-fluid for-dark" src="{{ asset("assets/images/logo/logo_dark.png") }}" alt="MyRepublic" />
+								<img class="img-fluid for-light" src="{{ asset("assets/images/logo/logo.png") }}" alt="MoraRepublic" />
+								<img class="img-fluid for-dark" src="{{ asset("assets/images/logo/logo_dark.png") }}" alt="MoraRepublic" />
 							</a>
 						</div>
 						<div class="toggle-sidebar">
@@ -327,8 +335,8 @@
 					<div>
 						<div class="logo-wrapper">
 							<a href="{{ route("home") }}">
-								<img class="img-fluid for-light" src="{{ asset("assets/images/logo/logo.png") }}" alt="MyRepublic" />
-								<img class="img-fluid for-dark" src="{{ asset("assets/images/logo/logo_dark.png") }}" alt="MyRepublic" />
+								<img class="img-fluid for-light" src="{{ asset("assets/images/logo/logo.png") }}" alt="MoraRepublic" />
+								<img class="img-fluid for-dark" src="{{ asset("assets/images/logo/logo_dark.png") }}" alt="MoraRepublic" />
 							</a>
 							<div class="back-btn"><i class="fa-solid fa-angle-left"></i></div>
 							<div class="toggle-sidebar">
@@ -474,7 +482,7 @@
 								<p class="mb-0">
 									&copy;
 									<span class="year-update"></span>
-									PT Telkom Akses &mdash; MyRepublic Kalimantan
+									PT Telkom Akses &mdash; MoraRepublic Kalimantan
 								</p>
 							</div>
 						</div>

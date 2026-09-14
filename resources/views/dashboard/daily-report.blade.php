@@ -49,45 +49,45 @@
 
 		.th-area {
 			min-width: 150px;
-			background: #f4f5f7 !important;
-			color: #3d3a4e !important;
+			background: #f0f1fd !important;
+			color: #1026A8 !important;
 		}
 
 		.th-unassign-group {
-			background: #fde8ec !important;
-			color: #b00c26 !important;
+			background: #f5d8fb !important;
+			color: #521595 !important;
 		}
 
 		.th-unassign {
-			background: #fff4f6 !important;
-			color: #c8102e !important;
+			background: #fbf0fe !important;
+			color: #630F94 !important;
 		}
 
 		.th-unassign-last {
 		}
 
 		.th-unassign-total {
-			background: #fcd5db !important;
-			color: #b00c26 !important;
+			background: #edbdf7 !important;
+			color: #521595 !important;
 			font-weight: 700;
 		}
 
 		.th-onprogress-group {
-			background: #ede3fb !important;
-			color: #4a0b8a !important;
+			background: #d8dbf8 !important;
+			color: #1026A8 !important;
 		}
 
 		.th-onprogress {
-			background: #f6f0ff !important;
-			color: #5b0ea6 !important;
+			background: #eceffe !important;
+			color: #2B36B4 !important;
 		}
 
 		.th-onprogress-last {
 		}
 
 		.th-onprogress-total {
-			background: #dfd0f9 !important;
-			color: #4a0b8a !important;
+			background: #c4c9f5 !important;
+			color: #1026A8 !important;
 			font-weight: 700;
 		}
 
@@ -96,32 +96,32 @@
 		}
 
 		.th-verification {
-			background: #e2edff !important;
-			color: #1a4fc4 !important;
+			background: #e8e0f8 !important;
+			color: #521595 !important;
 			font-size: 10px;
 			letter-spacing: 0.03em;
 			text-transform: uppercase;
 		}
 
 		.th-pending {
-			background: #fef3e2 !important;
-			color: #92400e !important;
+			background: #fff4dc !important;
+			color: #a06200 !important;
 			font-size: 10px;
 			letter-spacing: 0.03em;
 			text-transform: uppercase;
 		}
 
 		.th-cancel {
-			background: #fce7e7 !important;
-			color: #991b1b !important;
+			background: #fbe0fc !important;
+			color: #8E0499 !important;
 			font-size: 10px;
 			letter-spacing: 0.03em;
 			text-transform: uppercase;
 		}
 
 		.th-complete {
-			background: #e6f7ee !important;
-			color: #166534 !important;
+			background: #e6e8fc !important;
+			color: #1026A8 !important;
 			font-size: 10px;
 			letter-spacing: 0.03em;
 			text-transform: uppercase;
@@ -135,21 +135,21 @@
 		}
 
 		.td-unassign {
-			background: #fff4f6;
+			background: #fbf0fe;
 		}
 
 		.td-unassign-total {
-			color: var(--brand-red);
-			background: #fcd5db;
+			color: #521595;
+			background: #edbdf7;
 		}
 
 		.td-onprogress {
-			background: #f6f0ff;
+			background: #eceffe;
 		}
 
 		.td-onprogress-total {
-			color: var(--brand-purple);
-			background: #dfd0f9;
+			color: #1026A8;
+			background: #c4c9f5;
 		}
 
 		.s2-checkbox-item {
@@ -175,8 +175,8 @@
 
 		.select2-results__option--selected .s2-box,
 		.select2-results__option[aria-selected='true'] .s2-box {
-			background: var(--brand-purple);
-			border-color: var(--brand-purple);
+			background: var(--brand-primary);
+			border-color: var(--brand-primary);
 		}
 
 		.select2-results__option--selected .s2-box::after,
@@ -190,13 +190,13 @@
 		}
 
 		.select2-results__option--selected {
-			background-color: rgba(91, 14, 166, 0.06) !important;
+			background-color: rgba(16, 38, 168, 0.06) !important;
 			color: inherit !important;
 		}
 
 		.select2-container--default .select2-results__option--highlighted[aria-selected] {
-			background-color: rgba(91, 14, 166, 0.1) !important;
-			color: #1e1b2e !important;
+			background-color: rgba(16, 38, 168, 0.10) !important;
+			color: #0a1240 !important;
 		}
 
 		.td-num {
@@ -230,7 +230,7 @@
 		.filter-label-icon {
 			width: 13px;
 			height: 13px;
-			stroke: #5b0ea6;
+			stroke: #1026A8;
 			flex-shrink: 0;
 		}
 
@@ -415,11 +415,26 @@
 		}
 
 		.td-clickable:hover {
-			background-color: rgba(91, 14, 166, 0.06) !important;
+			background-color: rgba(16, 38, 168, 0.08) !important;
 		}
 
 		.td-dash {
 			color: #ccc;
+		}
+
+		.th-total {
+			background: #d8dbf8 !important;
+			color: #1026A8 !important;
+			font-size: 10px;
+			letter-spacing: 0.03em;
+			text-transform: uppercase;
+		}
+
+		.td-total {
+			background: #c4c9f5 !important;
+			color: #1026A8 !important;
+			font-weight: 700;
+			text-align: center;
 		}
 	</style>
 @endsection
@@ -582,6 +597,7 @@
 									<th class="th-pending report-header-group text-center align-middle" rowspan="3">PENDING</th>
 									<th class="th-cancel report-header-group text-center align-middle" rowspan="3">CANCEL</th>
 									<th class="th-complete report-header-group text-center align-middle" rowspan="3">COMPLETE</th>
+									<th class="th-total report-header-group text-center align-middle" rowspan="3">TOTAL</th>
 								</tr>
 								<tr>
 									<th class="th-unassign report-header-slot text-center" colspan="7">SLOT TIME</th>
@@ -608,7 +624,7 @@
 							</thead>
 							<tbody id="tbodyReport">
 								<tr>
-									<td colspan="21" class="table-empty-msg text-center">Pilih filter tanggal untuk memuat data.</td>
+									<td colspan="22" class="table-empty-msg text-center">Pilih filter tanggal untuk memuat data.</td>
 								</tr>
 							</tbody>
 						</table>
@@ -721,6 +737,7 @@
 				${numCell(row.wo_pending, '', 'wo_pending', clickArea)}
 				${numCell(row.wo_cancel, '', 'wo_cancel', clickArea)}
 				${numCell(row.wo_complete, '', 'wo_complete', clickArea)}
+				${numCell(row.total_wo, 'td-total', 'total_wo', clickArea)}
 			</tr>`;
 		}
 
@@ -732,7 +749,7 @@
 			const tbody = document.getElementById('tbodyReport');
 
 			if (!data.length) {
-				tbody.innerHTML = `<tr><td colspan="21" class="table-empty-msg text-center">Tidak ada data untuk filter yang dipilih.</td></tr>`;
+				tbody.innerHTML = `<tr><td colspan="22" class="table-empty-msg text-center">Tidak ada data untuk filter yang dipilih.</td></tr>`;
 				return;
 			}
 
@@ -757,6 +774,7 @@
 				'wo_pending',
 				'wo_cancel',
 				'wo_complete',
+				'total_wo',
 			];
 
 			const grandTotal = { area: 'TOTAL' };
@@ -826,7 +844,7 @@
 				},
 				error: function (xhr) {
 					document.getElementById('tbodyReport').innerHTML =
-						`<tr><td colspan="21" class="table-empty-msg text-center text-danger">
+						`<tr><td colspan="22" class="table-empty-msg text-center text-danger">
 							Gagal memuat data. ${xhr.responseJSON?.message || ''}
 						</td></tr>`;
 				},
@@ -923,6 +941,7 @@
 			wo_pending: 'Pending',
 			wo_cancel: 'Cancel',
 			wo_complete: 'Complete',
+			total_wo: 'Total WO',
 		};
 
 		let detailTable = null;

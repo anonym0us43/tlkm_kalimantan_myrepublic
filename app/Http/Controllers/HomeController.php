@@ -85,6 +85,7 @@ class HomeController extends Controller
             'wo_pending',
             'wo_cancel',
             'wo_complete',
+            'total_wo',
         ];
 
         $validated = $request->validate([

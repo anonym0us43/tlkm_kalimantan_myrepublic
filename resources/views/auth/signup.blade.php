@@ -4,8 +4,10 @@
 		<meta charset="UTF-8" />
 		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
 		<meta name="csrf-token" content="{{ csrf_token() }}" />
-		<link rel="icon" href="{{ asset("assets/images/favicon.png") }}" type="image/x-icon" />
-		<title>Daftar — MyRepublic</title>
+		<link rel="icon" type="image/png" sizes="192x192" href="{{ asset("assets/images/favicon-192x192.png") }}" />
+		<link rel="icon" type="image/png" href="{{ asset("assets/images/favicon.png") }}" />
+		<link rel="apple-touch-icon" sizes="180x180" href="{{ asset("assets/images/apple-touch-icon.png") }}" />
+		<title>Daftar — MoraRepublic</title>
 
 		<link rel="preconnect" href="https://fonts.googleapis.com" />
 		<link
@@ -141,7 +143,7 @@
 			}
 
 			.brand-top img {
-				height: 26px;
+				height: 64px;
 				filter: brightness(0) invert(1);
 				opacity: 0.92;
 			}
@@ -152,13 +154,10 @@
 				background: rgba(255, 255, 255, 0.3);
 			}
 
-			.brand-top-label {
-				font-family: 'Plus Jakarta Sans', sans-serif;
-				font-size: 11px;
-				font-weight: 600;
-				letter-spacing: 0.1em;
-				text-transform: uppercase;
-				color: rgba(255, 255, 255, 0.8);
+			.brand-partner-logo {
+				height: 28px;
+				filter: brightness(0) invert(1);
+				opacity: 0.88;
 			}
 
 			.brand-mid {
@@ -587,9 +586,14 @@
 			<div class="brand-arc arc-e"></div>
 
 			<div class="brand-top">
-				<img src="{{ asset("assets/images/logo/logo_dark.png") }}" alt="MyRepublic" />
+				<img src="{{ asset("assets/images/logo/logo_dark.png") }}" alt="MoraRepublic" />
 				<div class="brand-sep"></div>
-				<span class="brand-top-label">Telkom Akses</span>
+				<img
+					src="{{ asset("assets/images/logo/logo_telkomakses.png") }}"
+					alt="Telkom Akses"
+					class="brand-partner-logo"
+					style="height: 50px !important"
+				/>
 			</div>
 
 			<div class="brand-mid">

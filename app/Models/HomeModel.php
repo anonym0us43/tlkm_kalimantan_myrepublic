@@ -13,6 +13,7 @@ class HomeModel extends Model
             ->leftJoin('tb_webcc_wo_korlap as twk', 'tsw.workOrderNumber_id', '=', 'twk.wo_number_id')
             ->select([
                 'tsw.area',
+                DB::raw("COUNT(*) AS total_wo"),
                 DB::raw("SUM(CASE WHEN twk.installer IS NULL AND twk.slot_time = '09:00 - 11:00' THEN 1 ELSE 0 END) AS unassign_09to11"),
                 DB::raw("SUM(CASE WHEN twk.installer IS NULL AND twk.slot_time = '11:01 - 13:00' THEN 1 ELSE 0 END) AS unassign_11to13"),
                 DB::raw("SUM(CASE WHEN twk.installer IS NULL AND twk.slot_time = '13:01 - 15:00' THEN 1 ELSE 0 END) AS unassign_13to15"),
@@ -20,13 +21,13 @@ class HomeModel extends Model
                 DB::raw("SUM(CASE WHEN twk.installer IS NULL AND twk.slot_time = '17:01 - 19:00' THEN 1 ELSE 0 END) AS unassign_17to19"),
                 DB::raw("SUM(CASE WHEN twk.installer IS NULL AND twk.slot_time = '19:01 - 21:00' THEN 1 ELSE 0 END) AS unassign_19to21"),
                 DB::raw("SUM(CASE WHEN twk.installer IS NULL AND twk.slot_time = '21:01 - 23:00' THEN 1 ELSE 0 END) AS unassign_21to23"),
-                DB::raw("SUM(CASE WHEN twk.installer IS NOT NULL AND twk.slot_time = '09:00 - 11:00' THEN 1 ELSE 0 END) AS onprogress_09to11"),
-                DB::raw("SUM(CASE WHEN twk.installer IS NOT NULL AND twk.slot_time = '11:01 - 13:00' THEN 1 ELSE 0 END) AS onprogress_11to13"),
-                DB::raw("SUM(CASE WHEN twk.installer IS NOT NULL AND twk.slot_time = '13:01 - 15:00' THEN 1 ELSE 0 END) AS onprogress_13to15"),
-                DB::raw("SUM(CASE WHEN twk.installer IS NOT NULL AND twk.slot_time = '15:00 - 17:00' THEN 1 ELSE 0 END) AS onprogress_15to17"),
-                DB::raw("SUM(CASE WHEN twk.installer IS NOT NULL AND twk.slot_time = '17:01 - 19:00' THEN 1 ELSE 0 END) AS onprogress_17to19"),
-                DB::raw("SUM(CASE WHEN twk.installer IS NOT NULL AND twk.slot_time = '19:01 - 21:00' THEN 1 ELSE 0 END) AS onprogress_19to21"),
-                DB::raw("SUM(CASE WHEN twk.installer IS NOT NULL AND twk.slot_time = '21:01 - 23:00' THEN 1 ELSE 0 END) AS onprogress_21to23"),
+                DB::raw("SUM(CASE WHEN twk.installer IS NOT NULL AND twk.wo_agent IS NULL AND twk.slot_time = '09:00 - 11:00' THEN 1 ELSE 0 END) AS onprogress_09to11"),
+                DB::raw("SUM(CASE WHEN twk.installer IS NOT NULL AND twk.wo_agent IS NULL AND twk.slot_time = '11:01 - 13:00' THEN 1 ELSE 0 END) AS onprogress_11to13"),
+                DB::raw("SUM(CASE WHEN twk.installer IS NOT NULL AND twk.wo_agent IS NULL AND twk.slot_time = '13:01 - 15:00' THEN 1 ELSE 0 END) AS onprogress_13to15"),
+                DB::raw("SUM(CASE WHEN twk.installer IS NOT NULL AND twk.wo_agent IS NULL AND twk.slot_time = '15:00 - 17:00' THEN 1 ELSE 0 END) AS onprogress_15to17"),
+                DB::raw("SUM(CASE WHEN twk.installer IS NOT NULL AND twk.wo_agent IS NULL AND twk.slot_time = '17:01 - 19:00' THEN 1 ELSE 0 END) AS onprogress_17to19"),
+                DB::raw("SUM(CASE WHEN twk.installer IS NOT NULL AND twk.wo_agent IS NULL AND twk.slot_time = '19:01 - 21:00' THEN 1 ELSE 0 END) AS onprogress_19to21"),
+                DB::raw("SUM(CASE WHEN twk.installer IS NOT NULL AND twk.wo_agent IS NULL AND twk.slot_time = '21:01 - 23:00' THEN 1 ELSE 0 END) AS onprogress_21to23"),
                 DB::raw("SUM(CASE WHEN twk.wo_agent IS NULL AND twk.wo_installer IS NOT NULL THEN 1 ELSE 0 END) AS verification_agent"),
                 DB::raw("SUM(CASE WHEN twk.wo_agent IS NOT NULL AND twk.wo_installer = 'Pending' THEN 1 ELSE 0 END) AS wo_pending"),
                 DB::raw("SUM(CASE WHEN twk.wo_agent IS NOT NULL AND twk.wo_installer = 'Cancel' THEN 1 ELSE 0 END) AS wo_cancel"),
@@ -61,6 +62,7 @@ class HomeModel extends Model
 
                 return [
                     'area'               => e($row->area),
+                    'total_wo'           => (int) $row->total_wo,
                     'unassign_09to11'    => (int) $row->unassign_09to11,
                     'unassign_11to13'    => (int) $row->unassign_11to13,
                     'unassign_13to15'    => (int) $row->unassign_13to15,
@@ -150,7 +152,7 @@ class HomeModel extends Model
         }
         elseif (str_starts_with($column, 'onprogress_'))
         {
-            $query->whereNotNull('twk.installer');
+            $query->whereNotNull('twk.installer')->whereNull('twk.wo_agent');
             if (isset($slotMap[$column]))
             {
                 $query->where('twk.slot_time', $slotMap[$column]);
@@ -171,6 +173,10 @@ class HomeModel extends Model
         elseif ($column === 'wo_complete')
         {
             $query->whereNotNull('twk.wo_agent')->where('twk.wo_installer', 'Complete');
+        }
+        elseif ($column === 'total_wo')
+        {
+            // no additional filter — show all WOs in the date/area/wo_type scope
         }
 
         return $query
