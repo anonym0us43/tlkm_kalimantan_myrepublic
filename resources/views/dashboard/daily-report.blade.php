@@ -91,17 +91,43 @@
 			font-weight: 700;
 		}
 
-		.th-tail {
-			background: #eef0f3 !important;
-			color: #3d3a4e !important;
+		#tblDailyReport thead th {
+			font-weight: 700 !important;
+		}
+
+		.th-verification {
+			background: #e2edff !important;
+			color: #1a4fc4 !important;
 			font-size: 10px;
-			font-weight: 700;
+			letter-spacing: 0.03em;
+			text-transform: uppercase;
+		}
+
+		.th-pending {
+			background: #fef3e2 !important;
+			color: #92400e !important;
+			font-size: 10px;
+			letter-spacing: 0.03em;
+			text-transform: uppercase;
+		}
+
+		.th-cancel {
+			background: #fce7e7 !important;
+			color: #991b1b !important;
+			font-size: 10px;
+			letter-spacing: 0.03em;
+			text-transform: uppercase;
+		}
+
+		.th-complete {
+			background: #e6f7ee !important;
+			color: #166534 !important;
+			font-size: 10px;
 			letter-spacing: 0.03em;
 			text-transform: uppercase;
 		}
 
 		.td-area {
-			font-weight: 600;
 			font-size: 12.5px;
 			white-space: nowrap;
 			text-align: center;
@@ -113,7 +139,6 @@
 		}
 
 		.td-unassign-total {
-			font-weight: 700;
 			color: var(--brand-red);
 			background: #fcd5db;
 		}
@@ -123,7 +148,6 @@
 		}
 
 		.td-onprogress-total {
-			font-weight: 700;
 			color: var(--brand-purple);
 			background: #dfd0f9;
 		}
@@ -459,6 +483,77 @@
 		</div>
 	</div>
 
+	<div class="row mb-3">
+		<div class="col-xl-3 col-sm-6 col-12">
+			<div class="card small-widget mb-0">
+				<div class="card-body primary">
+					<span class="f-light">On Time Rate</span>
+					<div class="d-flex align-items-end gap-1">
+						<h4 id="kpiOtr">—</h4>
+						<span class="font-primary f-12 f-w-500">Target 95%</span>
+					</div>
+					<p class="f-light mb-0" style="font-size: 11px" id="kpiOtrFormula">— / — WO</p>
+					<div class="bg-gradient">
+						<svg class="stroke-icon svg-fill">
+							<use href="{{ asset("assets/svg/icon-sprite.svg#clock") }}"></use>
+						</svg>
+					</div>
+				</div>
+			</div>
+		</div>
+		<div class="col-xl-3 col-sm-6 col-12">
+			<div class="card small-widget mb-0">
+				<div class="card-body secondary">
+					<span class="f-light">Visit Rate</span>
+					<div class="d-flex align-items-end gap-1">
+						<h4 id="kpiVr">—</h4>
+						<span class="font-secondary f-12 f-w-500">Target 95%</span>
+					</div>
+					<p class="f-light mb-0" style="font-size: 11px" id="kpiVrFormula">— / — WO</p>
+					<div class="bg-gradient">
+						<svg class="stroke-icon svg-fill">
+							<use href="{{ asset("assets/svg/icon-sprite.svg#user-visitor") }}"></use>
+						</svg>
+					</div>
+				</div>
+			</div>
+		</div>
+		<div class="col-xl-3 col-sm-6 col-12">
+			<div class="card small-widget mb-0">
+				<div class="card-body warning">
+					<span class="f-light">SLA 24 Jam</span>
+					<div class="d-flex align-items-end gap-1">
+						<h4 id="kpiSla">—</h4>
+						<span class="font-warning f-12 f-w-500">Target 95%</span>
+					</div>
+					<p class="f-light mb-0" style="font-size: 11px" id="kpiSlaFormula">— / — WO</p>
+					<div class="bg-gradient">
+						<svg class="stroke-icon svg-fill">
+							<use href="{{ asset("assets/svg/icon-sprite.svg#analytics-rate") }}"></use>
+						</svg>
+					</div>
+				</div>
+			</div>
+		</div>
+		<div class="col-xl-3 col-sm-6 col-12">
+			<div class="card small-widget mb-0">
+				<div class="card-body success">
+					<span class="f-light">Success Rate</span>
+					<div class="d-flex align-items-end gap-1">
+						<h4 id="kpiSr">—</h4>
+						<span class="font-success f-12 f-w-500">Target 93%</span>
+					</div>
+					<p class="f-light mb-0" style="font-size: 11px" id="kpiSrFormula">— / — WO</p>
+					<div class="bg-gradient">
+						<svg class="stroke-icon svg-fill">
+							<use href="{{ asset("assets/svg/icon-sprite.svg#ord-success") }}"></use>
+						</svg>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+
 	<div class="row">
 		<div class="col-12">
 			<div class="card">
@@ -479,14 +574,14 @@
 									<th class="th-area report-header-group text-center" rowspan="3">AREA</th>
 									<th class="th-unassign-group report-header-group text-center" colspan="8">UN-ASSIGN</th>
 									<th class="th-onprogress-group report-header-group text-center" colspan="8">ON-PROGRESS</th>
-									<th class="th-tail report-header-group text-center align-middle" rowspan="3">
+									<th class="th-verification report-header-group text-center align-middle" rowspan="3">
 										VERIFICATION
 										<br />
 										AGENT
 									</th>
-									<th class="th-tail report-header-group text-center align-middle" rowspan="3">PENDING</th>
-									<th class="th-tail report-header-group text-center align-middle" rowspan="3">CANCEL</th>
-									<th class="th-tail report-header-group text-center align-middle" rowspan="3">COMPLETE</th>
+									<th class="th-pending report-header-group text-center align-middle" rowspan="3">PENDING</th>
+									<th class="th-cancel report-header-group text-center align-middle" rowspan="3">CANCEL</th>
+									<th class="th-complete report-header-group text-center align-middle" rowspan="3">COMPLETE</th>
 								</tr>
 								<tr>
 									<th class="th-unassign report-header-slot text-center" colspan="7">SLOT TIME</th>
@@ -581,6 +676,7 @@
 	<script src="{{ asset("assets/js/datatable/datatable-extension/buttons.html5.min.js") }}"></script>
 	<script>
 		const DAILY_REPORT_URL = '{{ route("ajax.daily.report") }}';
+		const KPI_URL = '{{ route("ajax.daily.report.kpi") }}';
 
 		function esc(s) {
 			return String(s ?? '').replace(/[&<>"']/g, function (c) {
@@ -672,6 +768,34 @@
 			tbody.innerHTML = rows + totalRow;
 		}
 
+		function setKpiCard(valId, formulaId, value, formula) {
+			document.getElementById(valId).textContent = value.toFixed(2).replace('.', ',') + '%';
+			document.getElementById(formulaId).textContent = formula;
+		}
+
+		function resetKpiCards() {
+			['kpiOtr', 'kpiVr', 'kpiSla', 'kpiSr'].forEach(function (id) {
+				document.getElementById(id).textContent = '—';
+			});
+			['kpiOtrFormula', 'kpiVrFormula', 'kpiSlaFormula', 'kpiSrFormula'].forEach(function (id) {
+				document.getElementById(id).textContent = '— / — WO';
+			});
+		}
+
+		function loadKpi(params) {
+			$.ajax({
+				url: KPI_URL + '?' + params.toString(),
+				type: 'GET',
+				success: function (res) {
+					const d = res.data;
+					setKpiCard('kpiOtr', 'kpiOtrFormula', d.on_time_rate, d.on_time_formula);
+					setKpiCard('kpiVr', 'kpiVrFormula', d.visit_rate, d.visit_formula);
+					setKpiCard('kpiSla', 'kpiSlaFormula', d.sla24_rate, d.sla24_formula);
+					setKpiCard('kpiSr', 'kpiSrFormula', d.success_rate, d.success_formula);
+				},
+			});
+		}
+
 		function loadReport() {
 			const startDate = document.getElementById('filterStartDate').value;
 			const endDate = document.getElementById('filterEndDate').value;
@@ -679,6 +803,7 @@
 			const woTypes = $('#filterWoType').val() || [];
 
 			if (!startDate || !endDate) {
+				resetKpiCards();
 				return;
 			}
 
@@ -690,6 +815,8 @@
 			woTypes.forEach(function (t) {
 				params.append('wo_type[]', t);
 			});
+
+			loadKpi(params);
 
 			$.ajax({
 				url: DAILY_REPORT_URL + '?' + params.toString(),

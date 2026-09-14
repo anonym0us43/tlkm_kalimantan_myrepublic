@@ -230,4 +230,66 @@ class HomeModel extends Model
             return [];
         }
     }
+
+    public static function kpiSummary(string $startDate, string $endDate, ?string $area, ?array $woTypes): array
+    {
+        $slotEndTime = "CASE twk.slot_time
+            WHEN '09:00 - 11:00' THEN '11:00:00'
+            WHEN '11:01 - 13:00' THEN '13:00:00'
+            WHEN '13:01 - 15:00' THEN '15:00:00'
+            WHEN '15:00 - 17:00' THEN '17:00:00'
+            WHEN '17:01 - 19:00' THEN '19:00:00'
+            WHEN '19:01 - 21:00' THEN '21:00:00'
+            WHEN '21:01 - 23:00' THEN '23:00:00'
+            ELSE '23:59:59' END";
+
+        $query = DB::table('tb_webcc_wo_korlap as twk')
+            ->join('tb_stella_workorders as tsw', 'tsw.workOrderNumber_id', '=', 'twk.wo_number_id')
+            ->select([
+                DB::raw('COUNT(*) as total_wo'),
+                DB::raw('SUM(CASE WHEN twk.installer IS NOT NULL THEN 1 ELSE 0 END) as visited'),
+                DB::raw("SUM(CASE WHEN twk.wo_installer = 'Complete' THEN 1 ELSE 0 END) as success_count"),
+                DB::raw("SUM(CASE WHEN twk.installer IS NOT NULL
+                    AND twk.updated_at <= DATE_ADD(twk.date_wo, INTERVAL 1 DAY)
+                    THEN 1 ELSE 0 END) as sla24_count"),
+                DB::raw("SUM(CASE WHEN twk.wo_installer = 'Complete'
+                    AND DATE(twk.updated_at) = twk.date_wo
+                    AND TIME(twk.updated_at) <= ({$slotEndTime})
+                    THEN 1 ELSE 0 END) as on_time_count"),
+            ])
+            ->whereBetween('twk.date_wo', [$startDate, $endDate]);
+
+        if ($area)
+        {
+            $query->where('tsw.area', $area);
+        }
+
+        if (!empty($woTypes))
+        {
+            $query->whereIn('tsw.workOrderType', $woTypes);
+        }
+
+        $row = $query->first();
+
+        $total      = (int) ($row->total_wo ?? 0);
+        $visited    = (int) ($row->visited ?? 0);
+        $sla24      = (int) ($row->sla24_count ?? 0);
+        $success    = (int) ($row->success_count ?? 0);
+        $onTime     = (int) ($row->on_time_count ?? 0);
+
+        $pct = fn(int $num, int $den): float => $den > 0 ? round($num / $den * 100, 2) : 0.0;
+
+        return [
+            'total_wo'          => $total,
+            'visited'           => $visited,
+            'visit_rate'        => $pct($visited, $total),
+            'visit_formula'     => "{$visited} / {$total} WO",
+            'sla24_rate'        => $pct($sla24, $visited),
+            'sla24_formula'     => "{$sla24} / {$visited} WO",
+            'success_rate'      => $pct($success, $visited),
+            'success_formula'   => "{$success} / {$visited} WO",
+            'on_time_rate'      => $pct($onTime, $visited),
+            'on_time_formula'   => "{$onTime} / {$visited} WO",
+        ];
+    }
 }

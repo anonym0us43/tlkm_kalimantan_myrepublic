@@ -43,6 +43,7 @@ Route::middleware(AuthSession::class)->group(function ()
         Route::get('/employee/data',  [AjaxController::class, 'employeeData'])->name('employee.data');
         Route::get('/daily-report',        [HomeController::class, 'dailyReport'])->name('daily.report');
         Route::get('/daily-report/detail', [HomeController::class, 'dailyReportDetail'])->name('daily.report.detail');
+        Route::get('/daily-report/kpi',    [HomeController::class, 'kpiSummary'])->name('daily.report.kpi');
     });
 
     Route::prefix('admin')->name('admin.')->group(function ()
