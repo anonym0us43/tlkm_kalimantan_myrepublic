@@ -33,9 +33,10 @@ Route::middleware(AuthSession::class)->group(function ()
 
     Route::prefix('ajax')->name('ajax.')->group(function ()
     {
-        Route::get('/area/data',     [AjaxController::class, 'areaData'])->name('area.data');
-        Route::get('/role/data',     [AjaxController::class, 'roleData'])->name('role.data');
-        Route::get('/employee/data', [AjaxController::class, 'employeeData'])->name('employee.data');
+        Route::get('/area/data',      [AjaxController::class, 'areaData'])->name('area.data');
+        Route::get('/role/data',      [AjaxController::class, 'roleData'])->name('role.data');
+        Route::get('/employee/data',  [AjaxController::class, 'employeeData'])->name('employee.data');
+        Route::get('/daily-report',   [HomeController::class, 'dailyReport'])->name('daily.report');
     });
 
     Route::prefix('admin')->name('admin.')->group(function ()
