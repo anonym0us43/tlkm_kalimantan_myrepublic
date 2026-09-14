@@ -86,6 +86,115 @@ class HomeModel extends Model
             ->toArray();
     }
 
+    public static function dailyReportDetail(
+        string $startDate,
+        string $endDate,
+        ?string $area,
+        ?string $woType,
+        string $column
+    ): array
+    {
+        $slotMap = [
+            'unassign_09to11'   => '09:00 - 11:00',
+            'unassign_11to13'   => '11:01 - 13:00',
+            'unassign_13to15'   => '13:01 - 15:00',
+            'unassign_15to17'   => '15:00 - 17:00',
+            'unassign_17to19'   => '17:01 - 19:00',
+            'unassign_19to21'   => '19:01 - 21:00',
+            'unassign_21to23'   => '21:01 - 23:00',
+            'onprogress_09to11' => '09:00 - 11:00',
+            'onprogress_11to13' => '11:01 - 13:00',
+            'onprogress_13to15' => '13:01 - 15:00',
+            'onprogress_15to17' => '15:00 - 17:00',
+            'onprogress_17to19' => '17:01 - 19:00',
+            'onprogress_19to21' => '19:01 - 21:00',
+            'onprogress_21to23' => '21:01 - 23:00',
+        ];
+
+        $query = DB::table('tb_stella_workorders as tsw')
+            ->join('tb_webcc_wo_korlap as twk', 'tsw.workOrderNumber_id', '=', 'twk.wo_number_id')
+            ->select([
+                'tsw.workOrderType',
+                'tsw.plan',
+                'twk.id_customer',
+                'twk.wo_number',
+                'twk.date_wo',
+                'twk.slot_time',
+                'twk.installer',
+                'twk.wo_agent',
+                'twk.wo_reason_agent',
+                'twk.wo_installer',
+                'twk.wo_reason_installer',
+                'twk.wo_remarks_installer',
+                'twk.updated_at',
+            ])
+            ->whereBetween('twk.date_wo', [$startDate, $endDate]);
+
+        if ($area)
+        {
+            $query->where('tsw.area', $area);
+        }
+
+        if ($woType)
+        {
+            $query->where('tsw.workOrderType', $woType);
+        }
+
+        if (str_starts_with($column, 'unassign_'))
+        {
+            $query->whereNull('twk.installer');
+            if (isset($slotMap[$column]))
+            {
+                $query->where('twk.slot_time', $slotMap[$column]);
+            }
+        }
+        elseif (str_starts_with($column, 'onprogress_'))
+        {
+            $query->whereNotNull('twk.installer');
+            if (isset($slotMap[$column]))
+            {
+                $query->where('twk.slot_time', $slotMap[$column]);
+            }
+        }
+        elseif ($column === 'verification_agent')
+        {
+            $query->whereNull('twk.wo_agent')->whereNotNull('twk.wo_installer');
+        }
+        elseif ($column === 'wo_pending')
+        {
+            $query->whereNotNull('twk.wo_agent')->where('twk.wo_installer', 'Pending');
+        }
+        elseif ($column === 'wo_cancel')
+        {
+            $query->whereNotNull('twk.wo_agent')->where('twk.wo_installer', 'Cancel');
+        }
+        elseif ($column === 'wo_complete')
+        {
+            $query->whereNotNull('twk.wo_agent')->where('twk.wo_installer', 'Complete');
+        }
+
+        return $query
+            ->orderBy('twk.date_wo')
+            ->orderBy('tsw.area')
+            ->get()
+            ->map(fn($row) => [
+                'wo_type'            => $row->workOrderType ?? '-',
+                'plan'               => $row->plan ?? '-',
+                'id_customer'        => $row->id_customer ?? '-',
+                'wo_number'          => $row->wo_number ?? '-',
+                'date_wo'            => $row->date_wo ?? '-',
+                'slot_time'          => $row->slot_time ?? '-',
+                'installer'          => $row->installer ?? '-',
+                'wo_agent'           => $row->wo_agent ?? '-',
+                'wo_reason_agent'    => $row->wo_reason_agent ?? '-',
+                'wo_installer'       => $row->wo_installer ?? '-',
+                'wo_reason_installer' => $row->wo_reason_installer ?? '-',
+                'wo_remarks'         => $row->wo_remarks_installer ?? '-',
+                'updated_at'         => $row->updated_at ?? '-',
+            ])
+            ->toArray();
+    }
+
     public static function distinctAreas(): array
     {
         try

@@ -361,10 +361,7 @@
 									</li>
 
 									<li class="sidebar-list">
-										<a
-											class="sidebar-link sidebar-title {{ request()->routeIs("home") ? "active" : "" }}"
-											href="{{ route("home") }}"
-										>
+										<a class="sidebar-link sidebar-title {{ request()->routeIs("dashboard.*") ? "active" : "" }}" href="#">
 											<svg class="stroke-icon">
 												<use href="{{ asset("assets/svg/icon-sprite.svg#stroke-home") }}"></use>
 											</svg>
@@ -373,6 +370,16 @@
 											</svg>
 											<span>Dashboard</span>
 										</a>
+										<ul class="sidebar-submenu">
+											<li>
+												<a
+													href="{{ route("dashboard.daily-report") }}"
+													class="{{ request()->routeIs("dashboard.daily-report") ? "active" : "" }}"
+												>
+													Daily Report
+												</a>
+											</li>
+										</ul>
 									</li>
 
 									<li class="sidebar-main-title">

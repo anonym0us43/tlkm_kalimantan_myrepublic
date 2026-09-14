@@ -31,12 +31,18 @@ Route::middleware(AuthSession::class)->group(function ()
 
     Route::get('/', [HomeController::class, 'index'])->name('home');
 
+    Route::prefix('dashboard')->name('dashboard.')->group(function ()
+    {
+        Route::get('/daily-report', [HomeController::class, 'dailyReportView'])->name('daily-report');
+    });
+
     Route::prefix('ajax')->name('ajax.')->group(function ()
     {
         Route::get('/area/data',      [AjaxController::class, 'areaData'])->name('area.data');
         Route::get('/role/data',      [AjaxController::class, 'roleData'])->name('role.data');
         Route::get('/employee/data',  [AjaxController::class, 'employeeData'])->name('employee.data');
-        Route::get('/daily-report',   [HomeController::class, 'dailyReport'])->name('daily.report');
+        Route::get('/daily-report',        [HomeController::class, 'dailyReport'])->name('daily.report');
+        Route::get('/daily-report/detail', [HomeController::class, 'dailyReportDetail'])->name('daily.report.detail');
     });
 
     Route::prefix('admin')->name('admin.')->group(function ()
