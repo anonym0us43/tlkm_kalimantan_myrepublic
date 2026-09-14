@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Middleware\AuthSession;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\HomeController;
@@ -20,7 +21,7 @@ Route::middleware('guest')->group(function ()
         ->name('signup.post');
 });
 
-Route::middleware('auth')->group(function ()
+Route::middleware(AuthSession::class)->group(function ()
 {
     Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 

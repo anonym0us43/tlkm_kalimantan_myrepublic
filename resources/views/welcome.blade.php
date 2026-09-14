@@ -163,7 +163,6 @@
 				<div
 					class="bg-[#fff2f2] dark:bg-[#1D0002] relative lg:-ml-px -mb-px lg:mb-0 rounded-t-lg lg:rounded-t-none lg:rounded-r-lg aspect-[335/364] lg:aspect-auto w-full lg:w-[438px] shrink-0 overflow-hidden"
 				>
-					{{-- Laravel Logo --}}
 					<svg
 						class="w-full text-[#F53003] dark:text-[#F61500] transition-all translate-y-0 opacity-100 max-w-none duration-750 starting:opacity-0 motion-safe:starting:translate-y-6"
 						viewBox="0 0 438 104"
@@ -191,7 +190,6 @@
 						/>
 					</svg>
 
-					{{-- 13 --}}
 					<svg
 						class="w-[438px] max-w-none relative -mt-[6.6rem] -ml-8 lg:ml-0 [--stroke-color:#1B1B18] dark:[--stroke-color:#FF750F]"
 						viewBox="0 0 440 392"

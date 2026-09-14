@@ -41,6 +41,7 @@ class AuthController extends Controller
         $request->session()->regenerate();
 
         Auth::user()->update(['ip_address' => $this->resolveIp()]);
+        $this->storeSession();
 
         return redirect()->intended(route('home'));
     }
@@ -82,8 +83,20 @@ class AuthController extends Controller
 
         Auth::login($employee);
         $request->session()->regenerate();
+        $this->storeSession();
 
         return redirect()->route('home');
+    }
+
+    private function storeSession(): void
+    {
+        $profile = AuthModel::profile();
+
+        session([
+            'name'      => $profile->nama,
+            'role'      => $profile->role_name,
+            'area'      => $profile->area_name,
+        ]);
     }
 
     private function resolveIp(): string

@@ -342,11 +342,14 @@
 
   // active link
   if ($(".simplebar-wrapper .simplebar-content-wrapper") && $("#pageWrapper").hasClass("compact-wrapper")) {
-    $(".simplebar-wrapper .simplebar-content-wrapper").animate(
-      {
-        scrollTop: $(".simplebar-wrapper .simplebar-content-wrapper a.active").offset().top - 400,
-      },
-      1000
-    );
+    var $activeLink = $(".simplebar-wrapper .simplebar-content-wrapper a.active");
+    if ($activeLink.length && $activeLink.offset()) {
+      $(".simplebar-wrapper .simplebar-content-wrapper").animate(
+        {
+          scrollTop: $activeLink.offset().top - 400,
+        },
+        1000
+      );
+    }
   }
 })(jQuery);
