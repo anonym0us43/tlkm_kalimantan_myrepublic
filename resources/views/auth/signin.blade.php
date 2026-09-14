@@ -185,10 +185,9 @@
 			}
 
 			.brand-desc {
-				font-size: 14px;
+				font-size: 13.5px;
 				line-height: 1.75;
 				color: rgba(255, 255, 255, 0.6);
-				max-width: 270px;
 			}
 
 			.brand-bottom {
@@ -484,15 +483,7 @@
 			</div>
 
 			<div class="brand-mid">
-				<div class="brand-eyebrow">Portal Karyawan</div>
-				<h1 class="brand-headline">
-					Sistem Informasi
-					<br />
-					Layanan Lapangan
-				</h1>
-				<p class="brand-desc">
-					Kelola tiket, koordinasi teknisi, dan pantau performa layanan jaringan MyRepublic di wilayah Kalimantan.
-				</p>
+				<p class="brand-desc">© {{ date("Y") }} PT Telkom Akses Branch Palangkaraya.</p>
 			</div>
 		</div>
 

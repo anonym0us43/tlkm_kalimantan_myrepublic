@@ -593,15 +593,7 @@
 			</div>
 
 			<div class="brand-mid">
-				<div class="brand-eyebrow">Pendaftaran Akun</div>
-				<h1 class="brand-headline">
-					Bergabung dengan
-					<br />
-					Tim Lapangan
-				</h1>
-				<p class="brand-desc">
-					Daftarkan akun Anda untuk mengakses sistem manajemen layanan MyRepublic di wilayah Kalimantan.
-				</p>
+				<p class="brand-desc">© {{ date("Y") }} PT Telkom Akses Branch Palangkaraya.</p>
 			</div>
 		</div>
 
