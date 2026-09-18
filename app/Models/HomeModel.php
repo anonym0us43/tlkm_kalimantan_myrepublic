@@ -196,7 +196,7 @@ class HomeModel extends Model
         $isClosed  = "({$status['wo_cancel']} OR {$status['wo_complete']})";
         $isVisited = "({$status['verification_agent']} OR {$status['wo_pending']} OR {$isClosed})"
             . ' AND NOT ' . self::IS_NOT_VISITED;
-        $isClosedWithin24h = "{$isClosed} AND twk.updated_at <= DATE_ADD(twk.date_wo, INTERVAL 1 DAY)";
+        $isCompleteWithin24h = "{$status['wo_complete']} AND twk.updated_at <= DATE_ADD(twk.date_wo, INTERVAL 1 DAY)";
 
         $row = self::baseQuery($startDate, $endDate, $area, $woTypes)
             ->leftJoin('tb_stella_workorders_detail as tswd', 'tswd.work_order_number_id', '=', 'twk.wo_number_id')
@@ -205,17 +205,19 @@ class HomeModel extends Model
                 DB::raw('COUNT(tswd.id) AS stella_wo'),
                 DB::raw('SUM(CASE WHEN tswd.is_on_time = 1 THEN 1 ELSE 0 END) AS on_time_wo'),
                 self::countWhen($isVisited, 'visited_wo'),
-                self::countWhen($isClosed, 'closed_wo'),
-                self::countWhen($isClosedWithin24h, 'closed_24h_wo'),
+                self::countWhen($status['wo_complete'], 'complete_wo'),
+                self::countWhen($isCompleteWithin24h, 'complete_24h_wo'),
+                self::countWhen($status['wo_cancel'], 'cancel_wo'),
             ])
             ->first();
 
-        $totalWo     = (int) ($row->total_wo ?? 0);
-        $stellaWo    = (int) ($row->stella_wo ?? 0);
-        $onTimeWo    = (int) ($row->on_time_wo ?? 0);
-        $visitedWo   = (int) ($row->visited_wo ?? 0);
-        $closedWo    = (int) ($row->closed_wo ?? 0);
-        $closed24hWo = (int) ($row->closed_24h_wo ?? 0);
+        $totalWo       = (int) ($row->total_wo ?? 0);
+        $stellaWo      = (int) ($row->stella_wo ?? 0);
+        $onTimeWo      = (int) ($row->on_time_wo ?? 0);
+        $visitedWo     = (int) ($row->visited_wo ?? 0);
+        $completeWo    = (int) ($row->complete_wo ?? 0);
+        $complete24hWo = (int) ($row->complete_24h_wo ?? 0);
+        $nonCancelWo   = $totalWo - (int) ($row->cancel_wo ?? 0);
 
         $percentage = fn(int $part, int $whole): float => $whole > 0 ? round($part / $whole * 100, 2) : 0.0;
 
@@ -224,10 +226,10 @@ class HomeModel extends Model
             'on_time_formula' => "{$onTimeWo} / {$stellaWo} WO Stella",
             'visit_rate'      => $percentage($visitedWo, $totalWo),
             'visit_formula'   => "{$visitedWo} / {$totalWo} WO",
-            'sla24_rate'      => $percentage($closed24hWo, $totalWo),
-            'sla24_formula'   => "{$closed24hWo} / {$totalWo} WO",
-            'success_rate'    => $percentage($closedWo, $totalWo),
-            'success_formula' => "{$closedWo} / {$totalWo} WO",
+            'sla24_rate'      => $percentage($complete24hWo, $nonCancelWo),
+            'sla24_formula'   => "{$complete24hWo} / {$nonCancelWo} WO (non-cancel)",
+            'success_rate'    => $percentage($completeWo, $nonCancelWo),
+            'success_formula' => "{$completeWo} / {$nonCancelWo} WO (non-cancel)",
         ];
     }
 }
