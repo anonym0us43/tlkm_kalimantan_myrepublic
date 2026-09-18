@@ -64,37 +64,13 @@ class HomeController extends Controller
 
     public function dailyReportDetail(Request $request): JsonResponse
     {
-        $allowedColumns = [
-            'unassign_09to11',
-            'unassign_11to13',
-            'unassign_13to15',
-            'unassign_15to17',
-            'unassign_17to19',
-            'unassign_19to21',
-            'unassign_21to23',
-            'unassign_total',
-            'onprogress_09to11',
-            'onprogress_11to13',
-            'onprogress_13to15',
-            'onprogress_15to17',
-            'onprogress_17to19',
-            'onprogress_19to21',
-            'onprogress_21to23',
-            'onprogress_total',
-            'verification_agent',
-            'wo_pending',
-            'wo_cancel',
-            'wo_complete',
-            'total_wo',
-        ];
-
         $validated = $request->validate([
             'start_date'   => ['required', 'date'],
             'end_date'     => ['required', 'date', 'after_or_equal:start_date'],
             'area'         => ['nullable', 'string', 'max:100'],
             'wo_type'      => ['nullable', 'array'],
             'wo_type.*'    => ['string', 'max:100'],
-            'column'       => ['required', 'string', Rule::in($allowedColumns)],
+            'column'       => ['required', 'string', Rule::in(HomeModel::reportColumns())],
         ]);
 
         $data = HomeModel::dailyReportDetail(

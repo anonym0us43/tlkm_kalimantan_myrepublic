@@ -53,23 +53,10 @@
 			color: #1026a8 !important;
 		}
 
-		.th-unassign-group {
+		.th-no-handle {
+			min-width: 110px;
 			background: #f5d8fb !important;
 			color: #521595 !important;
-		}
-
-		.th-unassign {
-			background: #fbf0fe !important;
-			color: #630f94 !important;
-		}
-
-		.th-unassign-last {
-		}
-
-		.th-unassign-total {
-			background: #edbdf7 !important;
-			color: #521595 !important;
-			font-weight: 700;
 		}
 
 		.th-onprogress-group {
@@ -134,13 +121,9 @@
 			vertical-align: middle !important;
 		}
 
-		.td-unassign {
-			background: #fbf0fe;
-		}
-
-		.td-unassign-total {
+		.td-no-handle {
 			color: #521595;
-			background: #edbdf7;
+			background: #fbf0fe;
 		}
 
 		.td-onprogress {
@@ -503,7 +486,11 @@
 							<thead>
 								<tr>
 									<th class="th-area report-header-group text-center" rowspan="3">AREA</th>
-									<th class="th-unassign-group report-header-group text-center" colspan="8">UN-ASSIGN</th>
+									<th class="th-no-handle report-header-group text-center align-middle" rowspan="3">
+										NO HANDLE
+										<br />
+										TEAM
+									</th>
 									<th class="th-onprogress-group report-header-group text-center" colspan="8">ON-PROGRESS</th>
 									<th class="th-verification report-header-group text-center align-middle" rowspan="3">
 										VERIFICATION
@@ -516,19 +503,10 @@
 									<th class="th-total report-header-group text-center align-middle" rowspan="3">TOTAL</th>
 								</tr>
 								<tr>
-									<th class="th-unassign report-header-slot text-center" colspan="7">SLOT TIME</th>
-									<th class="th-unassign-total report-header-slot text-center" rowspan="2">TOTAL</th>
 									<th class="th-onprogress report-header-slot text-center" colspan="7">SLOT TIME</th>
 									<th class="th-onprogress-total report-header-slot text-center" rowspan="2">TOTAL</th>
 								</tr>
 								<tr>
-									<th class="th-unassign report-header-sub text-center">09-11</th>
-									<th class="th-unassign report-header-sub text-center">11-13</th>
-									<th class="th-unassign report-header-sub text-center">13-15</th>
-									<th class="th-unassign report-header-sub text-center">15-17</th>
-									<th class="th-unassign report-header-sub text-center">17-19</th>
-									<th class="th-unassign report-header-sub text-center">19-21</th>
-									<th class="th-unassign th-unassign-last report-header-sub text-center">21-23</th>
 									<th class="th-onprogress report-header-sub text-center">09-11</th>
 									<th class="th-onprogress report-header-sub text-center">11-13</th>
 									<th class="th-onprogress report-header-sub text-center">13-15</th>
@@ -540,7 +518,7 @@
 							</thead>
 							<tbody id="tbodyReport">
 								<tr>
-									<td colspan="22" class="table-empty-msg text-center">Pilih filter tanggal untuk memuat data.</td>
+									<td colspan="15" class="table-empty-msg text-center">Pilih filter tanggal untuk memuat data.</td>
 								</tr>
 							</tbody>
 						</table>
@@ -633,14 +611,7 @@
 
 			return `<tr${rowClass}>
 				<td class="td-area">${areaLabel}</td>
-				${numCell(row.unassign_09to11, 'td-unassign', 'unassign_09to11', clickArea)}
-				${numCell(row.unassign_11to13, 'td-unassign', 'unassign_11to13', clickArea)}
-				${numCell(row.unassign_13to15, 'td-unassign', 'unassign_13to15', clickArea)}
-				${numCell(row.unassign_15to17, 'td-unassign', 'unassign_15to17', clickArea)}
-				${numCell(row.unassign_17to19, 'td-unassign', 'unassign_17to19', clickArea)}
-				${numCell(row.unassign_19to21, 'td-unassign', 'unassign_19to21', clickArea)}
-				${numCell(row.unassign_21to23, 'td-unassign', 'unassign_21to23', clickArea)}
-				${numCell(row.unassign_total, 'td-unassign-total', 'unassign_total', clickArea)}
+				${numCell(row.no_handle_team, 'td-no-handle', 'no_handle_team', clickArea)}
 				${numCell(row.onprogress_09to11, 'td-onprogress', 'onprogress_09to11', clickArea)}
 				${numCell(row.onprogress_11to13, 'td-onprogress', 'onprogress_11to13', clickArea)}
 				${numCell(row.onprogress_13to15, 'td-onprogress', 'onprogress_13to15', clickArea)}
@@ -665,19 +636,12 @@
 			const tbody = document.getElementById('tbodyReport');
 
 			if (!data.length) {
-				tbody.innerHTML = `<tr><td colspan="22" class="table-empty-msg text-center">Tidak ada data untuk filter yang dipilih.</td></tr>`;
+				tbody.innerHTML = `<tr><td colspan="15" class="table-empty-msg text-center">Tidak ada data untuk filter yang dipilih.</td></tr>`;
 				return;
 			}
 
 			const numericFields = [
-				'unassign_09to11',
-				'unassign_11to13',
-				'unassign_13to15',
-				'unassign_15to17',
-				'unassign_17to19',
-				'unassign_19to21',
-				'unassign_21to23',
-				'unassign_total',
+				'no_handle_team',
 				'onprogress_09to11',
 				'onprogress_11to13',
 				'onprogress_13to15',
@@ -760,7 +724,7 @@
 				},
 				error: function (xhr) {
 					document.getElementById('tbodyReport').innerHTML =
-						`<tr><td colspan="22" class="table-empty-msg text-center text-danger">
+						`<tr><td colspan="15" class="table-empty-msg text-center text-danger">
 							Gagal memuat data. ${xhr.responseJSON?.message || ''}
 						</td></tr>`;
 				},
@@ -837,14 +801,7 @@
 		const DETAIL_URL = '{{ route("ajax.daily.report.detail") }}';
 
 		const COL_LABELS = {
-			unassign_09to11: 'Un-Assign 09-11',
-			unassign_11to13: 'Un-Assign 11-13',
-			unassign_13to15: 'Un-Assign 13-15',
-			unassign_15to17: 'Un-Assign 15-17',
-			unassign_17to19: 'Un-Assign 17-19',
-			unassign_19to21: 'Un-Assign 19-21',
-			unassign_21to23: 'Un-Assign 21-23',
-			unassign_total: 'Un-Assign Total',
+			no_handle_team: 'No Handle Team',
 			onprogress_09to11: 'On-Progress 09-11',
 			onprogress_11to13: 'On-Progress 11-13',
 			onprogress_13to15: 'On-Progress 13-15',
