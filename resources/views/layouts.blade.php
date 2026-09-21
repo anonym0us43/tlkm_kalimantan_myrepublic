@@ -634,6 +634,14 @@
 													Daily Report
 												</a>
 											</li>
+											<li>
+												<a
+													href="{{ route("dashboard.kpi-ms-maintenance") }}"
+													class="{{ request()->routeIs("dashboard.kpi-ms-maintenance") ? "active" : "" }}"
+												>
+													KPI MS Maintenance
+												</a>
+											</li>
 										</ul>
 									</li>
 

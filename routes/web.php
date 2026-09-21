@@ -34,6 +34,7 @@ Route::middleware(AuthSession::class)->group(function ()
     Route::prefix('dashboard')->name('dashboard.')->group(function ()
     {
         Route::get('/daily-report', [HomeController::class, 'dailyReportView'])->name('daily-report');
+        Route::get('/kpi-ms-maintenance', [HomeController::class, 'kpiView'])->name('kpi-ms-maintenance');
     });
 
     Route::prefix('ajax')->name('ajax.')->group(function ()
@@ -44,6 +45,8 @@ Route::middleware(AuthSession::class)->group(function ()
         Route::get('/daily-report',        [HomeController::class, 'dailyReport'])->name('daily.report');
         Route::get('/daily-report/detail', [HomeController::class, 'dailyReportDetail'])->name('daily.report.detail');
         Route::get('/daily-report/kpi',    [HomeController::class, 'kpiSummary'])->name('daily.report.kpi');
+        Route::get('/kpi/daily', [HomeController::class, 'kpiDaily'])->name('kpi.daily');
+        Route::get('/kpi/daily/detail', [HomeController::class, 'kpiDailyDetail'])->name('kpi.daily.detail');
     });
 
     Route::prefix('admin')->name('admin.')->group(function ()

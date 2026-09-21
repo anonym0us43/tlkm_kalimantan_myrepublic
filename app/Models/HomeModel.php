@@ -23,6 +23,11 @@ class HomeModel extends Model
     private const IS_INSTALLER_EMPTY  = "COALESCE(twk.installer, '') = ''";
     private const IS_INSTALLER_WORKING = "COALESCE(twk.installer, '') <> '' AND twk.wo_installer IS NULL";
     private const IS_PAST_CUTOFF      = "NOW() >= TIMESTAMP(twk.date_wo, '21:00:00')";
+    private const HAS_ARRIVAL_AND_SLOT = "(NULLIF(tswd.arrival_time, '') IS NOT NULL AND tsw.slotTime REGEXP '^[0-9]{2}:')";
+    private const IS_ARRIVAL_ON_TIME   = "(" . self::HAS_ARRIVAL_AND_SLOT
+        . " AND TIME(tswd.arrival_time) <= MAKETIME(CAST(SUBSTRING(tsw.slotTime, 1, 2) AS UNSIGNED), 30, 0))";
+
+    private const KPI_WO_TYPES = ['Maintenance'];
 
     private const STATUS_CONDITIONS = [
         'no_handle_team'     => '(' . self::IS_INSTALLER_EMPTY
@@ -189,47 +194,195 @@ class HomeModel extends Model
         }
     }
 
-    public static function kpiSummary(string $startDate, string $endDate, ?string $area, ?array $woTypes): array
+    private static function kpiMetricConditions(): array
     {
         $status = self::STATUS_CONDITIONS;
 
         $isClosed  = "({$status['wo_cancel']} OR {$status['wo_complete']})";
-        $isVisited = "({$status['verification_agent']} OR {$status['wo_pending']} OR {$isClosed})"
-            . ' AND NOT ' . self::IS_NOT_VISITED;
-        $isCompleteWithin24h = "{$status['wo_complete']} AND twk.updated_at <= DATE_ADD(twk.date_wo, INTERVAL 1 DAY)";
-
-        $row = self::baseQuery($startDate, $endDate, $area, $woTypes)
-            ->leftJoin('tb_stella_workorders_detail as tswd', 'tswd.work_order_number_id', '=', 'twk.wo_number_id')
-            ->select([
-                DB::raw('COUNT(*) AS total_wo'),
-                DB::raw('COUNT(tswd.id) AS stella_wo'),
-                DB::raw('SUM(CASE WHEN tswd.is_on_time = 1 THEN 1 ELSE 0 END) AS on_time_wo'),
-                self::countWhen($isVisited, 'visited_wo'),
-                self::countWhen($status['wo_complete'], 'complete_wo'),
-                self::countWhen($isCompleteWithin24h, 'complete_24h_wo'),
-                self::countWhen($status['wo_cancel'], 'cancel_wo'),
-            ])
-            ->first();
-
-        $totalWo       = (int) ($row->total_wo ?? 0);
-        $stellaWo      = (int) ($row->stella_wo ?? 0);
-        $onTimeWo      = (int) ($row->on_time_wo ?? 0);
-        $visitedWo     = (int) ($row->visited_wo ?? 0);
-        $completeWo    = (int) ($row->complete_wo ?? 0);
-        $complete24hWo = (int) ($row->complete_24h_wo ?? 0);
-        $nonCancelWo   = $totalWo - (int) ($row->cancel_wo ?? 0);
-
-        $percentage = fn(int $part, int $whole): float => $whole > 0 ? round($part / $whole * 100, 2) : 0.0;
+        $isVisited = "(({$status['verification_agent']} OR {$status['wo_pending']} OR {$isClosed})"
+            . ' AND NOT ' . self::IS_NOT_VISITED . ')';
+        $isCompleteWithin24h = "({$status['wo_complete']} AND twk.updated_at <= DATE_ADD(twk.date_wo, INTERVAL 1 DAY))";
+        $isNotCancel         = "(COALESCE({$status['wo_cancel']}, 0) = 0)";
 
         return [
-            'on_time_rate'    => $percentage($onTimeWo, $stellaWo),
-            'on_time_formula' => "{$onTimeWo} / {$stellaWo} WO Stella",
-            'visit_rate'      => $percentage($visitedWo, $totalWo),
-            'visit_formula'   => "{$visitedWo} / {$totalWo} WO",
-            'sla24_rate'      => $percentage($complete24hWo, $nonCancelWo),
-            'sla24_formula'   => "{$complete24hWo} / {$nonCancelWo} WO (non-cancel)",
-            'success_rate'    => $percentage($completeWo, $nonCancelWo),
-            'success_formula' => "{$completeWo} / {$nonCancelWo} WO (non-cancel)",
+            'otr' => ['numerator' => self::IS_ARRIVAL_ON_TIME, 'denominator' => self::HAS_ARRIVAL_AND_SLOT],
+            'vr'  => ['numerator' => $isVisited, 'denominator' => '(1 = 1)'],
+            'sla' => ['numerator' => $isCompleteWithin24h, 'denominator' => $isNotCancel],
+            'sr'  => ['numerator' => $status['wo_complete'], 'denominator' => $isNotCancel],
         ];
+    }
+
+    public static function kpiMetrics(): array
+    {
+        return array_keys(self::kpiMetricConditions());
+    }
+
+    private static function kpiCountSelects(): array
+    {
+        $conditions = self::kpiMetricConditions();
+
+        return [
+            DB::raw('COUNT(*) AS total_wo'),
+            self::countWhen($conditions['otr']['denominator'], 'arrival_wo'),
+            self::countWhen($conditions['otr']['numerator'], 'on_time_wo'),
+            self::countWhen($conditions['vr']['numerator'], 'visited_wo'),
+            self::countWhen($conditions['sr']['numerator'], 'complete_wo'),
+            self::countWhen($conditions['sla']['numerator'], 'complete_24h_wo'),
+            self::countWhen(self::STATUS_CONDITIONS['wo_cancel'], 'cancel_wo'),
+        ];
+    }
+
+    private static function kpiCounts(?object $row): array
+    {
+        $counts = [];
+
+        foreach (['total_wo', 'arrival_wo', 'on_time_wo', 'visited_wo', 'complete_wo', 'complete_24h_wo', 'cancel_wo'] as $field)
+        {
+            $counts[$field] = (int) ($row->{$field} ?? 0);
+        }
+
+        return $counts;
+    }
+
+    private static function kpiParts(array $counts): array
+    {
+        $nonCancelWo = $counts['total_wo'] - $counts['cancel_wo'];
+
+        return [
+            'otr' => [$counts['on_time_wo'], $counts['arrival_wo']],
+            'vr'  => [$counts['visited_wo'], $counts['total_wo']],
+            'sla' => [$counts['complete_24h_wo'], $nonCancelWo],
+            'sr'  => [$counts['complete_wo'], $nonCancelWo],
+        ];
+    }
+
+    public static function kpiSummary(string $startDate, string $endDate, ?string $area, ?array $woTypes): array
+    {
+        $row = self::baseQuery($startDate, $endDate, $area, $woTypes)
+            ->leftJoin('tb_stella_workorders_detail as tswd', 'tswd.work_order_number_id', '=', 'twk.wo_number_id')
+            ->select(self::kpiCountSelects())
+            ->first();
+
+        $parts      = self::kpiParts(self::kpiCounts($row));
+        $percentage = fn(array $part): float => $part[1] > 0 ? round($part[0] / $part[1] * 100, 2) : 0.0;
+
+        return [
+            'on_time_rate'    => $percentage($parts['otr']),
+            'on_time_formula' => "{$parts['otr'][0]} / {$parts['otr'][1]} WO Stella (ada arrival time)",
+            'visit_rate'      => $percentage($parts['vr']),
+            'visit_formula'   => "{$parts['vr'][0]} / {$parts['vr'][1]} WO",
+            'sla24_rate'      => $percentage($parts['sla']),
+            'sla24_formula'   => "{$parts['sla'][0]} / {$parts['sla'][1]} WO (non-cancel)",
+            'success_rate'    => $percentage($parts['sr']),
+            'success_formula' => "{$parts['sr'][0]} / {$parts['sr'][1]} WO (non-cancel)",
+        ];
+    }
+
+    public static function kpiDaily(string $month): array
+    {
+        $firstDate = "{$month}-01";
+        $lastDate  = date('Y-m-t', strtotime($firstDate));
+
+        $rows = self::baseQuery($firstDate, $lastDate, null, self::KPI_WO_TYPES)
+            ->leftJoin('tb_stella_workorders_detail as tswd', 'tswd.work_order_number_id', '=', 'twk.wo_number_id')
+            ->select(array_merge(['tsw.area', 'twk.date_wo'], self::kpiCountSelects()))
+            ->groupBy('tsw.area', 'twk.date_wo')
+            ->get();
+
+        $countsByAreaAndDay = [];
+        $nationalCountsByDay = [];
+
+        foreach ($rows as $row)
+        {
+            $area   = $row->area ?? '-';
+            $day    = (int) substr($row->date_wo, 8, 2);
+            $counts = self::kpiCounts($row);
+
+            $countsByAreaAndDay[$area][$day] = $counts;
+
+            foreach ($counts as $field => $value)
+            {
+                $nationalCountsByDay[$day][$field] = ($nationalCountsByDay[$day][$field] ?? 0) + $value;
+            }
+        }
+
+        $toDailyRates = function (array $countsByDay): array
+        {
+            $dailyRates = [];
+
+            foreach ($countsByDay as $day => $counts)
+            {
+                $dailyRate = ['day' => $day, 'orders' => []];
+
+                foreach (self::kpiParts($counts) as $metric => [$part, $whole])
+                {
+                    $dailyRate[$metric]           = $whole > 0 ? round($part / $whole * 100, 2) : null;
+                    $dailyRate['orders'][$metric] = $part;
+                }
+
+                $dailyRates[] = $dailyRate;
+            }
+
+            return $dailyRates;
+        };
+
+        ksort($countsByAreaAndDay);
+
+        return [
+            'days_in_month' => (int) date('t', strtotime($firstDate)),
+            'areas'         => array_map(
+                fn($area, $countsByDay) => ['area' => $area, 'days' => $toDailyRates($countsByDay)],
+                array_keys($countsByAreaAndDay),
+                $countsByAreaAndDay
+            ),
+            'national'      => $toDailyRates($nationalCountsByDay),
+        ];
+    }
+
+    public static function kpiDailyDetail(string $date, ?string $area, string $metric, string $mode): array
+    {
+        $conditions = self::kpiMetricConditions()[$metric];
+        $filter     = $mode === 'order' ? $conditions['numerator'] : $conditions['denominator'];
+
+        return self::baseQuery($date, $date, $area, self::KPI_WO_TYPES)
+            ->leftJoin('tb_stella_workorders_detail as tswd', 'tswd.work_order_number_id', '=', 'twk.wo_number_id')
+            ->whereRaw($filter)
+            ->select([
+                'tsw.workOrderType',
+                'tsw.plan',
+                'twk.id_customer',
+                'twk.wo_number',
+                'twk.date_wo',
+                'tsw.slotTime',
+                'tswd.arrival_time',
+                'twk.installer',
+                'twk.wo_agent',
+                'twk.wo_reason_agent',
+                'twk.wo_installer',
+                'twk.updated_at',
+                DB::raw('DATE_ADD(twk.date_wo, INTERVAL 1 DAY) AS sla_deadline_date'),
+                DB::raw("CASE WHEN {$conditions['numerator']} THEN 1 ELSE 0 END AS is_achieved"),
+            ])
+            ->orderBy('tsw.slotTime')
+            ->orderBy('twk.wo_number')
+            ->get()
+            ->map(fn($row) => [
+                'wo_type'         => $row->workOrderType ?? '-',
+                'plan'            => $row->plan ?? '-',
+                'id_customer'     => $row->id_customer ?? '-',
+                'wo_number'       => $row->wo_number ?? '-',
+                'date_wo'         => $row->date_wo ?? '-',
+                'slot_time'       => $row->slotTime ?: '-',
+                'arrival_time'    => $row->arrival_time ?: '-',
+                'installer'       => $row->installer ?: '-',
+                'wo_agent'        => $row->wo_agent ?? '-',
+                'wo_reason_agent' => $row->wo_reason_agent ?? '-',
+                'wo_installer'    => $row->wo_installer ?? '-',
+                'updated_at'      => $row->updated_at ?? '-',
+                'otr_deadline'    => preg_match('/^\d{2}:/', (string) $row->slotTime) ? substr($row->slotTime, 0, 2) . ':30:00' : '-',
+                'sla_deadline'    => $row->sla_deadline_date . ' 00:00:00',
+                'is_achieved'     => (bool) $row->is_achieved,
+            ])
+            ->toArray();
     }
 }

@@ -22,6 +22,39 @@ class HomeController extends Controller
         return view('dashboard.daily-report', compact('areas', 'woTypes'));
     }
 
+    public function kpiView()
+    {
+        return view('dashboard.kpi');
+    }
+
+    public function kpiDaily(Request $request): JsonResponse
+    {
+        $validated = $request->validate([
+            'month' => ['required', 'regex:/^\d{4}-(0[1-9]|1[0-2])$/'],
+        ]);
+
+        return response()->json(['data' => HomeModel::kpiDaily($validated['month'])]);
+    }
+
+    public function kpiDailyDetail(Request $request): JsonResponse
+    {
+        $validated = $request->validate([
+            'date'   => ['required', 'date_format:Y-m-d'],
+            'area'   => ['nullable', 'string', 'max:100'],
+            'metric' => ['required', Rule::in(HomeModel::kpiMetrics())],
+            'mode'   => ['required', Rule::in(['percent', 'order'])],
+        ]);
+
+        $data = HomeModel::kpiDailyDetail(
+            $validated['date'],
+            $validated['area'] ?? null,
+            $validated['metric'],
+            $validated['mode']
+        );
+
+        return response()->json(['data' => $data]);
+    }
+
     public function dailyReport(Request $request): JsonResponse
     {
         $validated = $request->validate([
