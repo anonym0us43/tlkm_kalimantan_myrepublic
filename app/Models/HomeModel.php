@@ -112,6 +112,40 @@ class HomeModel extends Model
             ->toArray();
     }
 
+    private static function stellaDetailSelects(): array
+    {
+        return [
+            'tsw.subscriptionId',
+            'tsw.customerId',
+            DB::raw('COALESCE(tswd.work_order_number, twk.wo_number) AS work_order_number'),
+            'tswd.customer_name',
+            'tswd.customer_address',
+            'tswd.cluster_name',
+            'tswd.mobile_number',
+            'tswd.work_order_status',
+            DB::raw('COALESCE(tswd.plan, tsw.plan) AS plan'),
+            DB::raw("COALESCE(NULLIF(twk.installer, ''), tswd.technician_name) AS installer"),
+            'tswd.arrival_time',
+        ];
+    }
+
+    private static function stellaDetailFields(object $row): array
+    {
+        return [
+            'subscription_id'   => $row->subscriptionId ?: '-',
+            'customer_id'       => $row->customerId ?: '-',
+            'wo_number'         => $row->work_order_number ?: '-',
+            'customer_name'     => $row->customer_name ?: '-',
+            'customer_address'  => $row->customer_address ?: '-',
+            'cluster_name'      => $row->cluster_name ?: '-',
+            'mobile_number'     => $row->mobile_number ?: '-',
+            'work_order_status' => $row->work_order_status ?: '-',
+            'plan'              => $row->plan ?: '-',
+            'installer'         => $row->installer ?: '-',
+            'arrival_time'      => $row->arrival_time ?: '-',
+        ];
+    }
+
     public static function dailyReportDetail(
         string $startDate,
         string $endDate,
@@ -121,15 +155,13 @@ class HomeModel extends Model
     ): array
     {
         return self::baseQuery($startDate, $endDate, $area, $woTypes)
+            ->leftJoin('tb_stella_workorders_detail as tswd', 'tswd.work_order_number_id', '=', 'twk.wo_number_id')
             ->whereRaw(self::columnConditions()[$column])
             ->select([
+                ...self::stellaDetailSelects(),
                 'tsw.workOrderType',
-                'tsw.plan',
-                'twk.id_customer',
-                'twk.wo_number',
                 'twk.date_wo',
                 'twk.slot_time',
-                'twk.installer',
                 'twk.wo_agent',
                 'twk.wo_reason_agent',
                 'twk.wo_installer',
@@ -141,13 +173,10 @@ class HomeModel extends Model
             ->orderBy('tsw.area')
             ->get()
             ->map(fn($row) => [
+                ...self::stellaDetailFields($row),
                 'wo_type'             => $row->workOrderType ?? '-',
-                'plan'                => $row->plan ?? '-',
-                'id_customer'         => $row->id_customer ?? '-',
-                'wo_number'           => $row->wo_number ?? '-',
                 'date_wo'             => $row->date_wo ?? '-',
                 'slot_time'           => $row->slot_time ?? '-',
-                'installer'           => $row->installer ?? '-',
                 'wo_agent'            => $row->wo_agent ?? '-',
                 'wo_reason_agent'     => $row->wo_reason_agent ?? '-',
                 'wo_installer'        => $row->wo_installer ?? '-',
@@ -312,12 +341,12 @@ class HomeModel extends Model
 
             foreach ($countsByDay as $day => $counts)
             {
-                $dailyRate = ['day' => $day, 'orders' => []];
+                $dailyRate = ['day' => $day, 'counts' => []];
 
                 foreach (self::kpiParts($counts) as $metric => [$part, $whole])
                 {
                     $dailyRate[$metric]           = $whole > 0 ? round($part / $whole * 100, 2) : null;
-                    $dailyRate['orders'][$metric] = $part;
+                    $dailyRate['counts'][$metric] = ['yes' => $part, 'no' => $whole - $part];
                 }
 
                 $dailyRates[] = $dailyRate;
@@ -348,14 +377,10 @@ class HomeModel extends Model
             ->leftJoin('tb_stella_workorders_detail as tswd', 'tswd.work_order_number_id', '=', 'twk.wo_number_id')
             ->whereRaw($filter)
             ->select([
+                ...self::stellaDetailSelects(),
                 'tsw.workOrderType',
-                'tsw.plan',
-                'twk.id_customer',
-                'twk.wo_number',
                 'twk.date_wo',
                 'tsw.slotTime',
-                'tswd.arrival_time',
-                'twk.installer',
                 'twk.wo_agent',
                 'twk.wo_reason_agent',
                 'twk.wo_installer',
@@ -367,14 +392,10 @@ class HomeModel extends Model
             ->orderBy('twk.wo_number')
             ->get()
             ->map(fn($row) => [
+                ...self::stellaDetailFields($row),
                 'wo_type'         => $row->workOrderType ?? '-',
-                'plan'            => $row->plan ?? '-',
-                'id_customer'     => $row->id_customer ?? '-',
-                'wo_number'       => $row->wo_number ?? '-',
                 'date_wo'         => $row->date_wo ?? '-',
                 'slot_time'       => $row->slotTime ?: '-',
-                'arrival_time'    => $row->arrival_time ?: '-',
-                'installer'       => $row->installer ?: '-',
                 'wo_agent'        => $row->wo_agent ?? '-',
                 'wo_reason_agent' => $row->wo_reason_agent ?? '-',
                 'wo_installer'    => $row->wo_installer ?? '-',

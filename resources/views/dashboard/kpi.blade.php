@@ -203,14 +203,26 @@
 			font-size: 12.5px;
 		}
 
-		.table.kpi-table .td-num.below {
-			color: var(--kpi-danger);
+		.table.kpi-table .kpi-count {
+			color: #495057;
+		}
+
+		.table.kpi-table .kpi-count-divider {
+			margin: 0 3px;
+			color: #ced4da;
+		}
+
+		.table.kpi-table .kpi-rate {
+			margin-left: 6px;
 			font-weight: 600;
 		}
 
-		.table.kpi-table .td-num.achieved {
+		.table.kpi-table .kpi-rate.below {
+			color: var(--kpi-danger);
+		}
+
+		.table.kpi-table .kpi-rate.achieved {
 			color: var(--kpi-success-text);
-			font-weight: 600;
 		}
 
 		.table.kpi-table .td-dash {
@@ -306,24 +318,6 @@
 					</div>
 				</div>
 			</div>
-
-			<div class="card">
-				<div class="card-header">
-					<h5 class="mb-0 text-uppercase" id="kpiOrdersTitle">Order</h5>
-				</div>
-				<div class="card-body p-0">
-					<div class="table-responsive" id="wrapKpiOrdersTable">
-						<table class="table table-bordered table-sm mb-0 kpi-table" id="tblKpiOrders">
-							<thead id="theadKpiOrders"></thead>
-							<tbody id="tbodyKpiOrders">
-								<tr>
-									<td class="table-empty-msg">Pilih bulan untuk memuat data.</td>
-								</tr>
-							</tbody>
-						</table>
-					</div>
-				</div>
-			</div>
 		</div>
 	</div>
 
@@ -368,10 +362,42 @@
 		const KPI_DAILY_URL = '{{ route("ajax.kpi.daily") }}';
 		const KPI_DETAIL_URL = '{{ route("ajax.kpi.daily.detail") }}';
 		const KPI_METRICS = [
-			{ key: 'otr', label: '% OTR', short: 'OTR', resultLabel: 'On Time', target: 95, colorToken: '--brand-primary', headerClass: 'th-otr' },
-			{ key: 'vr', label: '% VR', short: 'VR', resultLabel: 'Dikunjungi', target: 95, colorToken: '--brand-magenta', headerClass: 'th-vr' },
-			{ key: 'sla', label: '% SLA', short: 'SLA', resultLabel: 'Selesai ≤ 24 Jam', target: 95, colorToken: '--kpi-warning', headerClass: 'th-sla' },
-			{ key: 'sr', label: '% SR', short: 'SR', resultLabel: 'Selesai', target: 93, colorToken: '--kpi-success', headerClass: 'th-sr' },
+			{
+				key: 'otr',
+				label: '% OTR',
+				short: 'OTR',
+				resultLabel: 'On Time',
+				target: 95,
+				colorToken: '--brand-primary',
+				headerClass: 'th-otr',
+			},
+			{
+				key: 'vr',
+				label: '% VR',
+				short: 'VR',
+				resultLabel: 'Dikunjungi',
+				target: 95,
+				colorToken: '--brand-magenta',
+				headerClass: 'th-vr',
+			},
+			{
+				key: 'sla',
+				label: '% SLA',
+				short: 'SLA',
+				resultLabel: 'Selesai ≤ 24 Jam',
+				target: 95,
+				colorToken: '--kpi-warning',
+				headerClass: 'th-sla',
+			},
+			{
+				key: 'sr',
+				label: '% SR',
+				short: 'SR',
+				resultLabel: 'Selesai',
+				target: 93,
+				colorToken: '--kpi-success',
+				headerClass: 'th-sr',
+			},
 		];
 
 		let kpiChart = null;
@@ -400,81 +426,68 @@
 			return ratesByDay;
 		}
 
-		function buildHeaderHtml(daysInMonth, labelPrefix)
-		{
+		function buildHeaderHtml(daysInMonth) {
 			let dayCells = '';
 			let metricCells = '';
 
-			for (let day = 1; day <= daysInMonth; day++)
-			{
+			for (let day = 1; day <= daysInMonth; day++) {
 				dayCells += `<th class="th-day report-header-group" colspan="4">${String(day).padStart(2, '0')}</th>`;
-				metricCells += KPI_METRICS.map(function (metric)
-				{
-					return `<th class="${metric.headerClass} report-header-sub">${labelPrefix}${metric.short}</th>`;
+				metricCells += KPI_METRICS.map(function (metric) {
+					return `<th class="${metric.headerClass} report-header-sub">${metric.label}</th>`;
 				}).join('');
 			}
 
 			return `<tr><th class="th-area report-header-group" rowspan="2">AREA</th>${dayCells}</tr><tr>${metricCells}</tr>`;
 		}
 
-		function clickableAttributes(metric, day, area)
-		{
+		function clickableAttributes(metric, day, area) {
 			return `data-metric="${metric.key}" data-day="${day}" data-area="${escapeHtml(area)}"`;
 		}
 
-		function buildPercentCell(dailyRate, metric, day, area)
-		{
+		function buildMetricCell(dailyRate, metric, day, area) {
 			const value = dailyRate ? dailyRate[metric.key] : null;
 
-			if (value === null || value === undefined)
-			{
+			if (value === null || value === undefined) {
 				return '<td class="td-num td-dash">-</td>';
 			}
 
+			const counts = dailyRate.counts[metric.key];
 			const targetClass = value >= metric.target ? 'achieved' : 'below';
 
-			return `<td class="td-num td-clickable ${targetClass}" ${clickableAttributes(metric, day, area)}>${formatPercent(value)}</td>`;
+			return (
+				`<td class="td-num td-clickable" ${clickableAttributes(metric, day, area)}>` +
+				`<span class="kpi-count">${counts.yes}</span>` +
+				'<span class="kpi-count-divider">|</span>' +
+				`<span class="kpi-count">${counts.no}</span>` +
+				`<span class="kpi-rate ${targetClass}">${formatPercent(value)}</span>` +
+				'</td>'
+			);
 		}
 
-		function buildOrderCell(dailyRate, metric, day, area)
-		{
-			const orders = dailyRate ? dailyRate.orders[metric.key] : 0;
-
-			if (orders <= 0)
-			{
-				return '<td class="td-num td-dash">-</td>';
-			}
-
-			return `<td class="td-num td-clickable" ${clickableAttributes(metric, day, area)}>${orders}</td>`;
-		}
-
-		function buildRow(label, dailyRates, daysInMonth, isNational, buildCell)
-		{
+		function buildRow(label, dailyRates, daysInMonth, isNational) {
 			const ratesByDay = indexByDay(dailyRates);
 			const clickArea = isNational ? '' : label;
 			let cells = '';
 
-			for (let day = 1; day <= daysInMonth; day++)
-			{
-				KPI_METRICS.forEach(function (metric)
-				{
-					cells += buildCell(ratesByDay[day], metric, day, clickArea);
+			for (let day = 1; day <= daysInMonth; day++) {
+				KPI_METRICS.forEach(function (metric) {
+					cells += buildMetricCell(ratesByDay[day], metric, day, clickArea);
 				});
 			}
 
 			return `<tr${isNational ? ' class="row-total"' : ''}><td class="td-area">${escapeHtml(label)}</td>${cells}</tr>`;
 		}
 
-		function renderTable(theadId, tbodyId, data, buildCell, labelPrefix)
-		{
-			const areaRows = data.areas.map(function (areaRow)
-			{
-				return buildRow(areaRow.area, areaRow.days, data.days_in_month, false, buildCell);
-			}).join('');
+		function renderTable(data) {
+			const areaRows = data.areas
+				.map(function (areaRow) {
+					return buildRow(areaRow.area, areaRow.days, data.days_in_month, false);
+				})
+				.join('');
 
-			document.getElementById(theadId).innerHTML = buildHeaderHtml(data.days_in_month, labelPrefix);
-			document.getElementById(tbodyId).innerHTML =
-				areaRows + buildRow('NASIONAL', data.national, data.days_in_month, true, buildCell);
+			document.getElementById('theadKpi').innerHTML = buildHeaderHtml(data.days_in_month);
+			document.getElementById('tbodyKpi').innerHTML =
+				areaRows + buildRow('NASIONAL', data.national, data.days_in_month, true);
 		}
 
 		function withOpacity(hexColor, opacity) {
@@ -621,62 +634,46 @@
 			kpiChart.render();
 		}
 
-		function updateTitle(month)
-		{
+		function updateTitle(month) {
 			const monthName = new Date(month + '-01T00:00:00').toLocaleDateString('id-ID', { month: 'long', year: 'numeric' });
 			document.getElementById('kpiTitle').textContent = 'Performance — ' + monthName;
-			document.getElementById('kpiOrdersTitle').textContent = 'Order — ' + monthName;
 		}
 
-		function setTablesVisible(isVisible)
-		{
-			['wrapKpiTable', 'wrapKpiOrdersTable'].forEach(function (wrapperId)
-			{
-				document.getElementById(wrapperId).style.display = isVisible ? 'block' : 'none';
-			});
+		function setTableVisible(isVisible) {
+			document.getElementById('wrapKpiTable').style.display = isVisible ? 'block' : 'none';
 		}
 
-		function showTablesError(message)
-		{
-			[['theadKpi', 'tbodyKpi'], ['theadKpiOrders', 'tbodyKpiOrders']].forEach(function ([theadId, tbodyId])
-			{
-				document.getElementById(theadId).innerHTML = '';
-				document.getElementById(tbodyId).innerHTML =
-					`<tr><td class="table-empty-msg text-danger">Gagal memuat data. ${escapeHtml(message)}</td></tr>`;
-			});
+		function showTableError(message) {
+			document.getElementById('theadKpi').innerHTML = '';
+			document.getElementById('tbodyKpi').innerHTML =
+				`<tr><td class="table-empty-msg text-danger">Gagal memuat data. ${escapeHtml(message)}</td></tr>`;
 		}
 
-		function loadKpiDaily()
-		{
+		function loadKpiDaily() {
 			const month = document.getElementById('filterMonth').value;
 
-			if (!month)
-			{
+			if (!month) {
 				return;
 			}
 
 			updateTitle(month);
 			document.getElementById('spinnerKpi').style.display = 'block';
-			setTablesVisible(false);
+			setTableVisible(false);
 
 			$.ajax({
 				url: KPI_DAILY_URL,
 				type: 'GET',
 				data: { month: month },
-				success: function (response)
-				{
+				success: function (response) {
 					renderChart(response.data, month);
-					renderTable('theadKpi', 'tbodyKpi', response.data, buildPercentCell, '% ');
-					renderTable('theadKpiOrders', 'tbodyKpiOrders', response.data, buildOrderCell, '');
+					renderTable(response.data);
 				},
-				error: function (xhr)
-				{
-					showTablesError(xhr.responseJSON?.message);
+				error: function (xhr) {
+					showTableError(xhr.responseJSON?.message);
 				},
-				complete: function ()
-				{
+				complete: function () {
 					document.getElementById('spinnerKpi').style.display = 'none';
-					setTablesVisible(true);
+					setTableVisible(true);
 				},
 			});
 		}
@@ -684,11 +681,7 @@
 		let detailTable = null;
 
 		const DETAIL_FORMULA_COLUMNS = {
-			otr: [
-				{ title: 'Slot Time', data: 'slot_time' },
-				{ title: 'Arrival Time', data: 'arrival_time' },
-				{ title: 'Batas On Time', data: 'otr_deadline' },
-			],
+			otr: [{ title: 'Batas On Time', data: 'otr_deadline' }],
 			vr: [
 				{ title: 'WO Agent', data: 'wo_agent' },
 				{ title: 'Alasan Agent', data: 'wo_reason_agent' },
@@ -706,13 +699,11 @@
 			],
 		};
 
-		function detailColumns(metric)
-		{
+		function detailColumns(metric) {
 			const resultColumn = {
 				title: metric.resultLabel,
 				data: 'is_achieved',
-				render: function (isAchieved, type)
-				{
+				render: function (isAchieved, type) {
 					const text = isAchieved ? 'Ya' : 'Tidak';
 
 					return type === 'display'
@@ -722,22 +713,36 @@
 			};
 
 			return [
-				{ title: 'No', data: null, render: function (value, type, row, meta) { return meta.row + 1; }, width: '40px', orderable: false },
-				{ title: 'Tipe WO', data: 'wo_type' },
-				{ title: 'Plan', data: 'plan' },
-				{ title: 'ID Customer', data: 'id_customer' },
-				{ title: 'WO Number', data: 'wo_number' },
+				{
+					title: 'No',
+					data: null,
+					render: function (value, type, row, meta) {
+						return meta.row + 1;
+					},
+					width: '40px',
+					orderable: false,
+				},
 				{ title: 'Tanggal', data: 'date_wo' },
+				{ title: 'WO Number', data: 'wo_number' },
+				{ title: 'Status WO', data: 'work_order_status' },
+				{ title: 'Tipe WO', data: 'wo_type' },
+				{ title: 'Subscription ID', data: 'subscription_id' },
+				{ title: 'Customer ID', data: 'customer_id' },
+				{ title: 'Nama Customer', data: 'customer_name' },
+				{ title: 'No. HP', data: 'mobile_number' },
+				{ title: 'Alamat', data: 'customer_address', className: 'text-wrap', width: '260px' },
+				{ title: 'Cluster', data: 'cluster_name' },
+				{ title: 'Plan', data: 'plan' },
+				{ title: 'Slot Time', data: 'slot_time' },
+				{ title: 'Arrival Time', data: 'arrival_time' },
 				{ title: 'Installer', data: 'installer' },
 				...DETAIL_FORMULA_COLUMNS[metric.key],
 				resultColumn,
 			];
 		}
 
-		function renderDetailTable(rows, metric)
-		{
-			if (detailTable)
-			{
+		function renderDetailTable(rows, metric) {
+			if (detailTable) {
 				detailTable.destroy();
 				$('#tblDetail').empty();
 			}
@@ -753,6 +758,7 @@
 				scrollX: true,
 				dom: "<'d-flex justify-content-between align-items-center mb-2'lf>tr<'d-flex justify-content-between align-items-center mt-2'ip>",
 				buttons: [{ extend: 'excel', title: $('#modalDetailTitle').text() }],
+				columnDefs: [{ targets: '_all', render: DataTable.render.text() }],
 				columns: detailColumns(metric),
 				pageLength: 25,
 				language: {
@@ -767,23 +773,21 @@
 				},
 			});
 
-			setTimeout(function ()
-			{
+			setTimeout(function () {
 				detailTable?.columns.adjust();
 			}, 350);
 		}
 
-		$('#tblKpi, #tblKpiOrders').on('click', '.td-clickable', function ()
-		{
+		$('#tblKpi').on('click', '.td-clickable', function () {
 			const metricKey = $(this).data('metric');
-			const metric = KPI_METRICS.find(function (item) { return item.key === metricKey; });
+			const metric = KPI_METRICS.find(function (item) {
+				return item.key === metricKey;
+			});
 			const month = document.getElementById('filterMonth').value;
 			const day = String($(this).data('day')).padStart(2, '0');
 			const area = $(this).data('area');
-			const mode = $(this).closest('table').attr('id') === 'tblKpiOrders' ? 'order' : 'percent';
-			const modeLabel = mode === 'order' ? 'Order ' + metric.short : metric.label;
 
-			$('#modalDetailTitle').text(`${modeLabel} — ${formatLongDate(month, day)} — ${area || 'NASIONAL'}`);
+			$('#modalDetailTitle').text(`${metric.label} — ${formatLongDate(month, day)} — ${area || 'NASIONAL'}`);
 			$('#spinnerDetail').show();
 			$('#wrapDetail').attr('hidden', true);
 			$('#modalDetail').modal('show');
@@ -791,13 +795,11 @@
 			$.ajax({
 				url: KPI_DETAIL_URL,
 				type: 'GET',
-				data: { date: `${month}-${day}`, area: area, metric: metric.key, mode: mode },
-				success: function (response)
-				{
+				data: { date: `${month}-${day}`, area: area, metric: metric.key, mode: 'percent' },
+				success: function (response) {
 					renderDetailTable(response.data || [], metric);
 				},
-				error: function ()
-				{
+				error: function () {
 					$('#spinnerDetail').hide();
 					$('#wrapDetail').removeAttr('hidden');
 					$('#tblDetail').html('<tbody><tr><td class="text-center text-danger py-3">Gagal memuat data.</td></tr></tbody>');
@@ -805,18 +807,14 @@
 			});
 		});
 
-		$('#btnExcelDetail').on('click', function ()
-		{
-			if (detailTable)
-			{
+		$('#btnExcelDetail').on('click', function () {
+			if (detailTable) {
 				detailTable.button(0).trigger();
 			}
 		});
 
-		$('#modalDetail').on('hidden.bs.modal', function ()
-		{
-			if (detailTable)
-			{
+		$('#modalDetail').on('hidden.bs.modal', function () {
+			if (detailTable) {
 				detailTable.destroy();
 				detailTable = null;
 			}
@@ -833,7 +831,20 @@
 			locale: {
 				months: {
 					shorthand: ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Agu', 'Sep', 'Okt', 'Nov', 'Des'],
-					longhand: ['Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'],
+					longhand: [
+						'Januari',
+						'Februari',
+						'Maret',
+						'April',
+						'Mei',
+						'Juni',
+						'Juli',
+						'Agustus',
+						'September',
+						'Oktober',
+						'November',
+						'Desember',
+					],
 				},
 			},
 			plugins: [new monthSelectPlugin({ shorthand: true, dateFormat: 'Y-m', altFormat: 'F Y' })],
