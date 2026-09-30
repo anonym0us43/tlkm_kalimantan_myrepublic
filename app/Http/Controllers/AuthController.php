@@ -3,11 +3,13 @@
 namespace App\Http\Controllers;
 
 use App\Models\AuthModel;
+use App\Models\RoleModel;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Validation\Rule;
 use Illuminate\View\View;
 
 class AuthController extends Controller
@@ -49,7 +51,7 @@ class AuthController extends Controller
     public function showSignup(): View
     {
         $areas = DB::table('tb_area')->orderBy('name')->get(['id', 'name']);
-        $roles = DB::table('tb_role')->where('name', '!=', 'Administrator')->orderBy('name')->get(['id', 'name']);
+        $roles = DB::table('tb_role')->where('id', '!=', RoleModel::ADMINISTRATOR_ID)->orderBy('name')->get(['id', 'name']);
 
         return view('auth.signup', compact('areas', 'roles'));
     }
@@ -61,7 +63,7 @@ class AuthController extends Controller
             'nik'      => ['required', 'string', 'max:12', 'unique:tb_employee,nik'],
             'password' => ['required', 'string', 'min:8', 'confirmed'],
             'area_id'  => ['required', 'integer', 'exists:tb_area,id'],
-            'role_id'  => ['required', 'integer', 'exists:tb_role,id'],
+            'role_id'  => ['required', 'integer', 'exists:tb_role,id', Rule::notIn([RoleModel::ADMINISTRATOR_ID])],
             'captcha'  => ['required', 'string'],
         ]);
 

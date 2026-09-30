@@ -19,18 +19,18 @@
 				<div class="card-header d-flex justify-content-between align-items-center">
 					<h5 class="mb-0">Data Role</h5>
 					<button type="button" class="btn btn-primary btn-sm" id="btnAdd">
-						<i data-feather="plus" class="me-1" style="width: 14px; height: 14px"></i>
-						Tambah Role
+						<i class="fa-solid fa-plus pe-2"></i>Tambah Role
 					</button>
 				</div>
-				<div class="card-body">
+				<div class="card-body admin-datatable">
 					<div class="table-responsive">
 						<table class="table table-hover" id="tblRole" width="100%">
 							<thead>
 								<tr>
 									<th width="50">No</th>
 									<th>Nama Role</th>
-									<th width="120">Tgl Dibuat</th>
+									<th width="130">Dibuat</th>
+									<th width="130">Diperbarui</th>
 									<th width="120">Aksi</th>
 								</tr>
 							</thead>
@@ -101,6 +101,7 @@
 				{ data: 'no', orderable: false, searchable: false },
 				{ data: 'name' },
 				{ data: 'created' },
+				{ data: 'updated' },
 				{
 					data: 'id',
 					orderable: false,

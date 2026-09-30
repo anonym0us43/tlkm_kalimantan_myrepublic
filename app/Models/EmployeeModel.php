@@ -2,10 +2,13 @@
 
 namespace App\Models;
 
+use App\Models\Concerns\FormatsAuditStamp;
 use Illuminate\Database\Eloquent\Model;
 
 class EmployeeModel extends Model
 {
+    use FormatsAuditStamp;
+
     protected $table = 'tb_employee';
 
     protected $fillable = [
@@ -13,6 +16,8 @@ class EmployeeModel extends Model
         'role_id',
         'nik',
         'nama',
+        'chat_id',
+        'username_telegram',
         'status',
         'ip_address',
         'password',
@@ -43,8 +48,14 @@ class EmployeeModel extends Model
             'tb_employee.id',
             'tb_employee.nik',
             'tb_employee.nama',
+            'tb_employee.chat_id',
+            'tb_employee.username_telegram',
+            'tb_employee.ip_address',
             'tb_employee.status',
+            'tb_employee.created_by',
             'tb_employee.created_at',
+            'tb_employee.updated_by',
+            'tb_employee.updated_at',
             'tb_area.name as area_name',
             'tb_role.name as role_name'
         )
@@ -59,16 +70,19 @@ class EmployeeModel extends Model
                 : '<span class="badge badge-light-danger">Non-Aktif</span>';
 
             return [
-                'no'        => $index + 1,
-                'id'        => $row->id,
-                'nik'       => e($row->nik),
-                'nama'      => e($row->nama),
-                'area_name' => e($row->area_name),
-                'role_name' => e($row->role_name),
-                'status'    => $badge,
-                'created'   => $row->created_at?->format('d/m/Y'),
+                'no'                => $index + 1,
+                'id'                => $row->id,
+                'nik'               => e($row->nik),
+                'nama'              => e($row->nama),
+                'area_name'         => e($row->area_name),
+                'role_name'         => e($row->role_name),
+                'chat_id'           => e($row->chat_id ?? '-'),
+                'username_telegram' => $row->username_telegram ? '@' . e($row->username_telegram) : '-',
+                'ip_address'        => e($row->ip_address ?? '-'),
+                'status'            => $badge,
+                'created'           => self::auditStamp($row->created_at, $row->created_by),
+                'updated'           => self::auditStamp($row->updated_at, $row->updated_by),
             ];
         })
         ->toArray();
-    }
-}
+    }}

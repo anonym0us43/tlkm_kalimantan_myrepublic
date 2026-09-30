@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Middleware\AuthSession;
+use App\Http\Middleware\AdministratorOnly;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\HomeController;
@@ -39,9 +40,6 @@ Route::middleware(AuthSession::class)->group(function ()
 
     Route::prefix('ajax')->name('ajax.')->group(function ()
     {
-        Route::get('/area/data',      [AjaxController::class, 'areaData'])->name('area.data');
-        Route::get('/role/data',      [AjaxController::class, 'roleData'])->name('role.data');
-        Route::get('/employee/data',  [AjaxController::class, 'employeeData'])->name('employee.data');
         Route::get('/daily-report',        [HomeController::class, 'dailyReport'])->name('daily.report');
         Route::get('/daily-report/detail', [HomeController::class, 'dailyReportDetail'])->name('daily.report.detail');
         Route::get('/daily-report/kpi',    [HomeController::class, 'kpiSummary'])->name('daily.report.kpi');
@@ -49,7 +47,14 @@ Route::middleware(AuthSession::class)->group(function ()
         Route::get('/kpi/daily/detail', [HomeController::class, 'kpiDailyDetail'])->name('kpi.daily.detail');
     });
 
-    Route::prefix('admin')->name('admin.')->group(function ()
+    Route::middleware(AdministratorOnly::class)->prefix('ajax')->name('ajax.')->group(function ()
+    {
+        Route::get('/area/data',      [AjaxController::class, 'areaData'])->name('area.data');
+        Route::get('/role/data',      [AjaxController::class, 'roleData'])->name('role.data');
+        Route::get('/employee/data',  [AjaxController::class, 'employeeData'])->name('employee.data');
+    });
+
+    Route::middleware(AdministratorOnly::class)->prefix('admin')->name('admin.')->group(function ()
     {
         Route::get('/area',         [AreaController::class, 'index'])->name('area.index');
         Route::post('/area',        [AreaController::class, 'store'])->name('area.store');

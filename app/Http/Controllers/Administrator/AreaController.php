@@ -29,7 +29,7 @@ class AreaController extends Controller
 
     public function show(int $id): JsonResponse
     {
-        return response()->json(AreaModel::findOrFail($id));
+        return response()->json(AreaModel::select('id', 'code', 'initial', 'name')->findOrFail($id));
     }
 
     public function update(Request $request, int $id): JsonResponse

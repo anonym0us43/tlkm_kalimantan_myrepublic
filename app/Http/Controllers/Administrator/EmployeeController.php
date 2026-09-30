@@ -13,6 +13,11 @@ use Illuminate\Support\Facades\Hash;
 
 class EmployeeController extends Controller
 {
+    private const TELEGRAM_MESSAGES = [
+        'chat_id.regex'           => 'Chat ID hanya boleh berisi angka (maksimal 19 digit).',
+        'username_telegram.regex' => 'Username Telegram 5-32 karakter: huruf, angka, atau underscore.',
+    ];
+
     public function index()
     {
         $areas = AreaModel::select('id', 'name')->orderBy('name')->get();
@@ -28,9 +33,11 @@ class EmployeeController extends Controller
             'role_id'  => ['required', 'integer', 'exists:tb_role,id'],
             'nik'      => ['required', 'string', 'max:12', 'unique:tb_employee,nik'],
             'nama'     => ['required', 'string', 'max:255'],
+            'chat_id'  => ['nullable', 'regex:/^-?[0-9]{1,19}$/'],
+            'username_telegram' => ['nullable', 'regex:/^[A-Za-z0-9_]{5,32}$/'],
             'status'   => ['required', 'boolean'],
             'password' => ['required', 'string', 'min:8'],
-        ]);
+        ], self::TELEGRAM_MESSAGES);
 
         $validated['password']   = Hash::make($validated['password']);
         $validated['created_by'] = Auth::user()->nik;
@@ -43,7 +50,7 @@ class EmployeeController extends Controller
     public function show(int $id): JsonResponse
     {
         return response()->json(
-            EmployeeModel::select('id', 'area_id', 'role_id', 'nik', 'nama', 'status')->findOrFail($id)
+            EmployeeModel::select('id', 'area_id', 'role_id', 'nik', 'nama', 'chat_id', 'username_telegram', 'ip_address', 'status')->findOrFail($id)
         );
     }
 
@@ -56,6 +63,8 @@ class EmployeeController extends Controller
             'role_id' => ['required', 'integer', 'exists:tb_role,id'],
             'nik'     => ['required', 'string', 'max:12', 'unique:tb_employee,nik,' . $id],
             'nama'    => ['required', 'string', 'max:255'],
+            'chat_id' => ['nullable', 'regex:/^-?[0-9]{1,19}$/'],
+            'username_telegram' => ['nullable', 'regex:/^[A-Za-z0-9_]{5,32}$/'],
             'status'  => ['required', 'boolean'],
         ];
 
@@ -64,7 +73,7 @@ class EmployeeController extends Controller
             $rules['password'] = ['string', 'min:8'];
         }
 
-        $validated = $request->validate($rules);
+        $validated = $request->validate($rules, self::TELEGRAM_MESSAGES);
 
         if ($request->filled('password'))
         {

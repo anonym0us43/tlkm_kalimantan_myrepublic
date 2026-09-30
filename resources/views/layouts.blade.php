@@ -202,6 +202,11 @@
 		@yield("styles")
 
 		<style>
+			.admin-datatable .dt-container,
+			.admin-datatable .dt-container .table {
+				font-size: 12px;
+			}
+
 			.select2-container {
 				width: 100% !important;
 			}
@@ -645,6 +650,7 @@
 										</ul>
 									</li>
 
+									@if (auth()->user()->isAdministrator())
 									<li class="sidebar-main-title">
 										<div>
 											<h6>Administrator</h6>
@@ -691,6 +697,7 @@
 											</li>
 										</ul>
 									</li>
+									@endif
 								</ul>
 							</div>
 							<div class="right-arrow" id="right-arrow"><i data-feather="arrow-right"></i></div>

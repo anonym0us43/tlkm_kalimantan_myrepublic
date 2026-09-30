@@ -19,11 +19,10 @@
 				<div class="card-header d-flex justify-content-between align-items-center">
 					<h5 class="mb-0">Data Area</h5>
 					<button type="button" class="btn btn-primary btn-sm" id="btnAdd">
-						<i data-feather="plus" class="me-1" style="width: 14px; height: 14px"></i>
-						Tambah Area
+						<i class="fa-solid fa-plus pe-2"></i>Tambah Area
 					</button>
 				</div>
-				<div class="card-body">
+				<div class="card-body admin-datatable">
 					<div class="table-responsive">
 						<table class="table table-hover" id="tblArea" width="100%">
 							<thead>
@@ -32,7 +31,7 @@
 									<th width="80">Kode</th>
 									<th width="70">Inisial</th>
 									<th>Nama Area</th>
-									<th width="120">Diperbarui</th>
+									<th width="130">Diperbarui</th>
 									<th width="120">Aksi</th>
 								</tr>
 							</thead>

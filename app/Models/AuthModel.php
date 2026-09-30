@@ -45,4 +45,9 @@ class AuthModel extends Authenticatable
             ->where('tb_employee.id', Auth::id())
             ->first();
     }
+
+    public function isAdministrator(): bool
+    {
+        return (int) $this->role_id === RoleModel::ADMINISTRATOR_ID;
+    }
 }

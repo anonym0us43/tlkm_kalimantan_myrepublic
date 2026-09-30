@@ -20,11 +20,10 @@
 				<div class="card-header d-flex justify-content-between align-items-center">
 					<h5 class="mb-0">Data Employee</h5>
 					<button type="button" class="btn btn-primary btn-sm" id="btnAdd">
-						<i data-feather="plus" class="me-1" style="width: 14px; height: 14px"></i>
-						Tambah Employee
+						<i class="fa-solid fa-plus pe-2"></i>Tambah Employee
 					</button>
 				</div>
-				<div class="card-body">
+				<div class="card-body admin-datatable">
 					<div class="table-responsive">
 						<table class="table table-hover" id="tblEmployee" width="100%">
 							<thead>
@@ -34,8 +33,12 @@
 									<th>Nama</th>
 									<th>Area</th>
 									<th>Role</th>
+									<th>Chat ID</th>
+									<th>Username Telegram</th>
+									<th>IP Terakhir</th>
 									<th width="100">Status</th>
-									<th width="120">Tgl Dibuat</th>
+									<th width="130">Dibuat</th>
+									<th width="130">Diperbarui</th>
 									<th width="120">Aksi</th>
 								</tr>
 							</thead>
@@ -102,6 +105,19 @@
 								<div class="invalid-feedback" id="errRoleId"></div>
 							</div>
 							<div class="col-md-6">
+								<label for="chat_id" class="form-label fw-semibold">Chat ID Telegram</label>
+								<input type="text" class="form-control" id="chat_id" name="chat_id" maxlength="20" inputmode="numeric" autocomplete="off" />
+								<div class="invalid-feedback" id="errChatId"></div>
+							</div>
+							<div class="col-md-6">
+								<label for="username_telegram" class="form-label fw-semibold">Username Telegram</label>
+								<div class="input-group has-validation">
+									<span class="input-group-text">@</span>
+									<input type="text" class="form-control" id="username_telegram" name="username_telegram" maxlength="32" autocomplete="off" />
+									<div class="invalid-feedback" id="errUsernameTelegram"></div>
+								</div>
+							</div>
+							<div class="col-md-6">
 								<label for="password" class="form-label fw-semibold">
 									Password
 									<span class="text-danger" id="pwdRequired">*</span>
@@ -120,6 +136,10 @@
 									<option value="0">Non-Aktif</option>
 								</select>
 								<div class="invalid-feedback" id="errStatus"></div>
+							</div>
+							<div class="col-md-6" id="ipAddressGroup" style="display: none">
+								<label for="ip_address" class="form-label fw-semibold">IP Login Terakhir</label>
+								<input type="text" class="form-control" id="ip_address" readonly />
 							</div>
 						</div>
 					</div>
@@ -179,8 +199,12 @@
 				{ data: 'nama' },
 				{ data: 'area_name' },
 				{ data: 'role_name' },
+				{ data: 'chat_id' },
+				{ data: 'username_telegram' },
+				{ data: 'ip_address' },
 				{ data: 'status', orderable: false, searchable: false },
 				{ data: 'created' },
+				{ data: 'updated' },
 				{
 					data: 'id',
 					orderable: false,
@@ -216,6 +240,7 @@
 			$('#formEmployee [id^="err"]').text('');
 			$('#pwdRequired').show();
 			$('#pwdHint').hide();
+			$('#ipAddressGroup').hide();
 		}
 
 		function applyValidationErrors(errors) {
@@ -224,6 +249,8 @@
 				role_id: 'errRoleId',
 				nik: 'errNik',
 				nama: 'errNama',
+				chat_id: 'errChatId',
+				username_telegram: 'errUsernameTelegram',
 				password: 'errPassword',
 				status: 'errStatus',
 			};
@@ -255,7 +282,11 @@
 				$('#nama').val(data.nama);
 				$('#area_id').val(data.area_id).trigger('change');
 				$('#role_id').val(data.role_id).trigger('change');
+				$('#chat_id').val(data.chat_id);
+				$('#username_telegram').val(data.username_telegram);
 				$('#status').val(data.status);
+				$('#ip_address').val(data.ip_address || '-');
+				$('#ipAddressGroup').show();
 				$('#modalEmployee').modal('show');
 			});
 		});
@@ -279,6 +310,8 @@
 					role_id: $('#role_id').val(),
 					nik: $('#nik').val().trim(),
 					nama: $('#nama').val().trim(),
+					chat_id: $('#chat_id').val().trim(),
+					username_telegram: $('#username_telegram').val().trim().replace(/^@+/, ''),
 					status: $('#status').val(),
 					password: $('#password').val(),
 				},

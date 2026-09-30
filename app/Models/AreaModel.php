@@ -2,10 +2,13 @@
 
 namespace App\Models;
 
+use App\Models\Concerns\FormatsAuditStamp;
 use Illuminate\Database\Eloquent\Model;
 
 class AreaModel extends Model
 {
+    use FormatsAuditStamp;
+
     protected $table = 'tb_area';
 
     const CREATED_AT = null;
@@ -30,7 +33,7 @@ class AreaModel extends Model
                     'code'    => e($row->code ?? '-'),
                     'initial' => e($row->initial ?? '-'),
                     'name'    => e($row->name),
-                    'updated' => $row->updated_at?->format('d/m/Y'),
+                    'updated' => self::auditStamp($row->updated_at),
                 ];
             })
             ->toArray();
